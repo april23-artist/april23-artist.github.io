@@ -26,7 +26,7 @@ jobs:
       # 3. 安裝 Hugo 主題
       - name: Install Hugo theme
         run: |
-          git submodule update --init --recursive  # 若使用 submodule 主題，初始化主題
+          git clone https://github.com/CaiJimmy/hugo-theme-stack.git themes/hugo-theme-stack
 
       # 4. 建構 Hugo 網站
       - name: Build the site
