@@ -2,7 +2,7 @@
 mainSections = ["post"]
 # Output page's full content in RSS.
 rssFullContent = true
-favicon = "/favicon.png"
+favicon = "/favicon.jpg"
 
 [footer]
 since = 2020
@@ -13,13 +13,12 @@ published = "Jan 02, 2006"
 lastUpdated = "Jan 02, 2006 15:04 MST"
 
 [sidebar]
-emoji = "🍥"
-subtitle = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+subtitle = "工程師，做事阿。"
 
 [sidebar.avatar]
 enabled = true
 local = true
-src = "img/avatar.png"
+src = "img/avatar.jpg"
 
 [article]
 headingAnchor = false
@@ -54,10 +53,6 @@ limit = 10
 
 [[widgets.page]]
 type = "toc"
-
-[opengraph.twitter]
-site = ""
-card = "summary_large_image"
 
 [defaultImage.opengraph]
 enabled = false
