@@ -120,13 +120,6 @@ jobs:
           clean: true # 部署之前清理已有的文件
 ```
 
-## 結語
-
-- 準備網站：使用 Hugo 構建網站並推送到 GitHub。 </br>
-- 配置 GitHub Pages：設定 GitHub Pages 使用 gh-pages 分支來部署網站。 </br>
-- 設定 GitHub Actions：創建 .github/workflows/deploy.yml 文件，配置自動化部署工作流。 </br>
-- 啟動部署：每次 push 到 main 分支時，GitHub Actions 會自動構建並將網站部署到 gh-pages 分支。
-
 ## 參考
 
 - [Stack](https://stack.jimmycai.com/)
