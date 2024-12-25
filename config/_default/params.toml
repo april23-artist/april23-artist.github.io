@@ -5,8 +5,8 @@ rssFullContent = true
 favicon = "/favicon.jpg"
 
 [footer]
-since = 2020
-customText = ""
+since = 2024
+customText = "All rights reserved，未經允許不得隨意轉載"
 
 [dateFormat]
 published = "Jan 02, 2006"
