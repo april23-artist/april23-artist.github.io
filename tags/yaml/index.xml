@@ -167,14 +167,7 @@ Settings &amp;gt; (Code and automation) Pages &amp;gt; (Build and deployment) Br
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">clean&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 部署之前清理已有的文件&lt;/span>&lt;span class="w">
 &lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
-&lt;/div>&lt;h2 id="結語">結語
-&lt;/h2>&lt;ul>
-&lt;li>準備網站：使用 Hugo 構建網站並推送到 GitHub。 &lt;/br>&lt;/li>
-&lt;li>配置 GitHub Pages：設定 GitHub Pages 使用 gh-pages 分支來部署網站。 &lt;/br>&lt;/li>
-&lt;li>設定 GitHub Actions：創建 .github/workflows/deploy.yml 文件，配置自動化部署工作流。 &lt;/br>&lt;/li>
-&lt;li>啟動部署：每次 push 到 main 分支時，GitHub Actions 會自動構建並將網站部署到 gh-pages 分支。&lt;/li>
-&lt;/ul>
-&lt;h2 id="參考">參考
+&lt;/div>&lt;h2 id="參考">參考
 &lt;/h2>&lt;ul>
 &lt;li>&lt;a class="link" href="https://stack.jimmycai.com/" target="_blank" rel="noopener"
 >Stack&lt;/a>&lt;/li>
