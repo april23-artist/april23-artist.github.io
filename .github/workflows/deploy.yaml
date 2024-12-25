@@ -40,5 +40,3 @@ jobs:
           branch: gh-pages      # 部署到 gh-pages 分支
           folder: public        # Hugo 網站的輸出目錄
           clean: true           # 部署之前清理已有的文件
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub 自動生成的 token，用於授權

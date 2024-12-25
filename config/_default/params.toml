@@ -69,18 +69,6 @@ enabled = true
 [imageProcessing.content]
 enabled = true
 
-## Comments
-[comments]
-enabled = true
-provider = "disqus"
-
-[comments.disqusjs]
-shortname = ""
-apiUrl = ""
-apiKey = ""
-admin = ""
-adminLabel = ""
-
 [comments.utterances]
 repo = ""
 issueTerm = "pathname"
