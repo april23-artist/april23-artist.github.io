@@ -1,6 +1,5 @@
 ---
-title: 部署 Hugo 到 GitHub Pages
-description: 透過 GitHub Actions 自動化部署 Hugo
+title: 透過 GitHub Actions 自動化部署 Hugo 到 GitHub Pages
 slug: deploy-hugo-to-github-pages
 date: "2024-12-24"
 categories:
@@ -9,24 +8,25 @@ categories:
 tags:
   - "PowerShell"
   - "Yaml"
+  - "Hugo"
 weight: 1
 ---
 
 ## 前言
 
-想紀錄開發筆記，決定透過 GitHub Actions 自動化部署 Hugo 到 GitHub Pages 。
+想紀錄開發筆記，決定透過 GitHub Actions 自動化部署 Hugo 到 GitHub Pages。
 
 ## 步驟
 
 ### Windows 安裝 Hugo
 
-安裝 Chocolatey ，使用管理員身分開啟 Windows Terminal 。
+安裝 Chocolatey ，使用管理員身分開啟 Windows Terminal。
 
 ```powershell
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 ```
 
-安裝 Hugo ，並確認 Hugo 版本。
+安裝 Hugo，並確認 Hugo 版本。
 
 ```powershell
 choco install hugo
@@ -36,30 +36,30 @@ hugo version
 
 ### 建立 GitHub Repository
 
-建立名稱為 \<username\>.github.io 的 Repo 作為 Hugo 的專案。 </br>
-這裡使用的 hugo theme 為 [Stask](https://stack.jimmycai.com/) ，直接使用 [hugo-theme-stack-stater](https://github.com/CaiJimmy/hugo-theme-stack-starter) 範例來修改。 </br>
-將 hugo-theme-stack-stater 內的檔案放入 \<username\>.github.io 。
+建立名稱為 \<user_name\>.github.io 的 Repo 作為 Hugo 的專案。 </br>
+這裡使用的 hugo theme 為 [Stask](https://stack.jimmycai.com/)，直接使用 [hugo-theme-stack-stater](https://github.com/CaiJimmy/hugo-theme-stack-starter) 範例來修改。 </br>
+將 hugo-theme-stack-stater 內的檔案放入 \<user_name\>.github.io。
 
 ```powershell
 git clone https://github.com/CaiJimmy/hugo-theme-stack-starter.git hugo-theme-stack-starter
 ```
 
 因為環境未安裝 Go 在執行 hugo build 時會出錯，所以要稍微調整。 </br>
-範例專案沒有 theme ，需下載 [hugo-theme-stack](https://github.com/CaiJimmy/hugo-theme-stack.git)。
+範例專案沒有 theme，需下載 [hugo-theme-stack](https://github.com/CaiJimmy/hugo-theme-stack.git)。
 
 ```powershell
 git clone https://github.com/CaiJimmy/hugo-theme-stack.git themes/hugo-theme-stack
 ```
 
 將專案內 go.mod, go.sum 刪除。 </br>
-並調整 config > \_default > module.toml 。
+並調整 config > \_default > module.toml。
 
 ```diff
 - path = "github.com/CaiJimmy/hugo-theme-stack/v3"
 + path = "hugo-theme-stack"
 ```
 
-建置並啟動網站，若成功啟動網站即可將專案 push 到 GitHub 。
+建置並啟動網站，若成功啟動網站即可將專案 push 到 GitHub。
 
 ```powershell
 hugo build
@@ -68,8 +68,8 @@ hugo server --disableFastRender
 
 ### 設定 GitHub Pages
 
-新增分支 gh-pages 。 </br>
-Settings > (Code and automation) Pages > (Build and deployment) Branch 設定為分支 gh-pages/(root) 。
+新增分支 gh-pages。 </br>
+Settings > (Code and automation) Pages > (Build and deployment) Branch 設定為分支 gh-pages/(root)。
 
 ### 設定 Workflow
 
