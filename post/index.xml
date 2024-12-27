@@ -1,246 +1,169 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Allen Artist</title><link>https://april23-artist.github.io/post/</link><description>Recent content in Posts on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 25 Dec 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Multipass 搭配 k3s 建立 Kubernetes Cluster</title><link>https://april23-artist.github.io/p/multipass-k3s/</link><pubDate>Wed, 25 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/multipass-k3s/</guid><description>&lt;h2 id="前言">前言
-&lt;/h2>&lt;p>Multipass 是輕量化的虛擬機管理工具，選擇搭配 k3s 而不選擇 minikube 是因為 k3s 可以建立多個 node ，非常適合用來學習 k8s 的知識。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Allen Artist</title><link>https://april23-artist.github.io/post/</link><description>Recent content in Posts on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 27 Dec 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>在 Kubernetes Cluster 安裝 Helm</title><link>https://april23-artist.github.io/p/k8s-install-helm/</link><pubDate>Fri, 27 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/k8s-install-helm/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>Helm 可以將 K8s 資源文件 (Deployment、Service、ConfigMap 等) 應用程式打包為 Chart。
+可以輕鬆安裝和管理 Chart，並且能夠執行升級、回滾、卸載等操作。Helm 減少了手動編寫和管理 K8s 資源的負擔。&lt;/p>
+&lt;h2 id="步驟">步驟
+&lt;/h2>&lt;h3 id="安裝-helm">安裝 Helm
+&lt;/h3>&lt;p>下載 Helm 後目錄會有 helm-v3.16.3-linux-amd64.tar.gz 文件。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">wget https://get.helm.sh/helm-v3.16.3-linux-amd64.tar.gz
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>解壓縮 helm-v3.16.3-linux-amd64.tar.gz 文件。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">tar -zxvf helm-v3.16.3-linux-amd64.tar.gz
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>進入 linux-amd64 目錄，將 linux-amd64 目錄底下的 helm 複製到 /usr/local/bin/。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> linux-amd64/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp helm /usr/local/bin/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>檢查安裝是否完成。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">helm version
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="使用-helm-create-chart-name-新增-chart">使用 helm create &amp;lt;chart-name&amp;gt; 新增 chart
+&lt;/h3>&lt;p>新增 chart 會建立一個 &amp;lt;chart-name&amp;gt; 的資料夾。 &lt;/br>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">helm create &amp;lt;chart_name&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;lt;chart_name&amp;gt;/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── Chart.yaml &lt;span class="c1"># Helm Chart 的元數據文件，包含了有關 Chart 的基本信息，例如名稱、版本、描述等。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── charts/ &lt;span class="c1"># 用來存放其他 Chart 的依賴包。當你在 Chart.yaml 中指定了依賴關係時，這些依賴會被下載並放到這個目錄中。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── templates/ &lt;span class="c1"># Kubernetes 資源的模板文件。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">└── values.yaml &lt;span class="c1"># 定義了 Helm Chart 中的默認值，它是 Chart 的配置文件。&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="常用-helm-指令">常用 helm 指令
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">helm install &amp;lt;chart_name&amp;gt; &lt;span class="c1"># 安裝&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm uninstall &amp;lt;chart_name&amp;gt; &lt;span class="c1"># 卸載&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm delete &amp;lt;chart_name&amp;gt; &lt;span class="c1"># 刪除&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm upgrade &amp;lt;chart_name&amp;gt; &lt;span class="c1"># 升級&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm &lt;span class="nb">history&lt;/span> &amp;lt;chart_name&amp;gt; &lt;span class="c1"># 歷史紀錄&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm rollback &amp;lt;chart_name&amp;gt; &amp;lt;version&amp;gt; &lt;span class="c1"># 版本回滾&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm upgrade --install &amp;lt;chart_name&amp;gt; &lt;span class="c1"># 安裝或升級&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># -n &amp;lt;namespace&amp;gt; namespace 配置&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># --values &amp;lt;values&amp;gt;.yaml 該文件包含 Helm Chart 配置的默認值&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># -f &amp;lt;overwrite-values&amp;gt;.yaml 讓你覆蓋默認的配置&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm upgrade --install &amp;lt;chart_name&amp;gt; -n &amp;lt;namespace&amp;gt; --values &amp;lt;values&amp;gt;.yaml -f &amp;lt;overwrite-values&amp;gt;.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="參考">參考
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://helm.sh/" target="_blank" rel="noopener"
+>helm&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>在 Kubernetes Cluster 安裝 Network File System</title><link>https://april23-artist.github.io/p/k8s-install-nfs/</link><pubDate>Fri, 27 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/k8s-install-nfs/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>NFS (Network File System) 是一種共享文件系統，它允許不同的主機或容器之間共享文件或資料夾。 &lt;/br>
+NFS 是一種網路檔案系統協定，可以讓多個容器和 Pod 在不同的節點上訪問同一份數據，這對於需要跨多個 Pod 或節點持久儲存數據的應用非常有用。&lt;/p>
+&lt;h2 id="步驟">步驟
+&lt;/h2>&lt;p>每個 node 都需要安裝。&lt;/p>
+&lt;h3 id="安裝-nfs-客戶端工具-nfs-common">安裝 NFS 客戶端工具 (nfs-common)
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 更新包列表&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 安裝 NFS 客戶端工具&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt install nfs-common
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="安裝-nfs-伺服器工具-nfs-kernel-server">安裝 NFS 伺服器工具 (nfs-kernel-server)
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo apt install nfs-kernel-server
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="啟動-nfs-伺服器">啟動 NFS 伺服器
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo systemctl start nfs-kernel-server
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 檢查 NFS 伺服器狀態&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl status nfs-kernel-server
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 檢查 NFS 客戶端，使用 showmount 命令查看 NFS 伺服器共享的目錄&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">showmount -e &amp;lt;nfs_server_ip&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="選擇適合共享-nfs-目錄的-node-適合資料存儲的配置的-node">選擇適合共享 nfs 目錄的 node (適合資料存儲的配置的 node)
+&lt;/h3>&lt;p>進入 nfs server node，這邊選擇 /home/nfs/rw 作為共享目錄。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo mkdir /home/nfs/rw
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>設置共享目錄。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 加上共享設定&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># /home/nfs/rw &amp;lt;nfs_server_ip&amp;gt;.0.0/16(rw,sync,no_subtree_check,no_root_squash)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo nano /etc/exports
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>重新加載。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">exportfs -f
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl reload nfs-server
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="補充-將-nfs-server-node-共享目錄掛載到其他-node-的指定目錄裡">(補充) 將 nfs server node 共享目錄掛載到其他 node 的指定目錄裡
+&lt;/h3>&lt;p>進入其他 node，選擇要同步共享目錄的資料夾。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo mkdir -p /mnt/nfs/rw
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mount -t nfs &amp;lt;nfs_server_ip&amp;gt;:/home/nfs/rw /mnt/nfs/rw
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 取消掛載&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo umount /mnt/nfs/rw
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Multipass 搭配 k3s 建立 Kubernetes Cluster</title><link>https://april23-artist.github.io/p/multipass-k3s/</link><pubDate>Wed, 25 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/multipass-k3s/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>Multipass 是輕量化的虛擬機管理工具，選擇搭配 k3s 而不選擇 minikube 是因為 k3s 可以建立多個 node，非常適合用來學習 k8s 的知識。&lt;/p>
 &lt;h2 id="步驟">步驟
 &lt;/h2>&lt;h3 id="安裝-multipass">安裝 Multipass
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">choco&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="n">multipass&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="建立虛擬機-nodes">建立虛擬機 (nodes)
-&lt;/h3>&lt;p>共建立 3 個 node ，1 個 master，2 個 worker 。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">launch&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-name&lt;/span> &lt;span class="nb">k8s-master&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-cpus&lt;/span> &lt;span class="mf">1&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-memory&lt;/span> &lt;span class="n">4G&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-disk&lt;/span> &lt;span class="n">10G&lt;/span>
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">choco&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="n">multipass&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="建立虛擬機-nodes">建立虛擬機 (nodes)
+&lt;/h3>&lt;p>建立 3 個 node ，1 個 master，2 個 worker。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">launch&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-name&lt;/span> &lt;span class="nb">k8s-master&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-cpus&lt;/span> &lt;span class="mf">1&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-memory&lt;/span> &lt;span class="n">4G&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-disk&lt;/span> &lt;span class="n">10G&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">launch&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-name&lt;/span> &lt;span class="nb">k8s-node1&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-cpus&lt;/span> &lt;span class="mf">1&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-memory&lt;/span> &lt;span class="n">4G&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-disk&lt;/span> &lt;span class="n">10G&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">launch&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-name&lt;/span> &lt;span class="nb">k8s-node2&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-cpus&lt;/span> &lt;span class="mf">1&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-memory&lt;/span> &lt;span class="n">4G&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-disk&lt;/span> &lt;span class="n">10G&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>常用的 Multipass 指令&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="nb">ls &lt;/span> &lt;span class="c"># 虛擬機列表&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="nb">start &lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">nodename&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="c"># 啟動虛擬機&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">stop&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">nodename&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="c"># 關閉虛擬機&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">shell&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">nodename&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="c"># 進入虛擬機&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">delete&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">nodename&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="c"># 刪除虛擬機&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>常用的 Multipass 指令。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="nb">ls &lt;/span> &lt;span class="c"># 虛擬機列表&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="nb">start &lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">node_name&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="c"># 啟動虛擬機&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">stop&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">node_name&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="c"># 關閉虛擬機&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">shell&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">node_name&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="c"># 進入虛擬機&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">delete&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">node_name&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="c"># 刪除虛擬機&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">purge&lt;/span> &lt;span class="c"># 清除已刪除虛擬機&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="在-master-node-建立-k3s">在 master node 建立 k3s
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">curl -sfL https://get.k3s.io &lt;span class="p">|&lt;/span> sh -
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>查看 k3s 配置文件&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">cat /etc/rancher/k3s/k3s.yaml
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>安裝後即可使用 kubectl 指令&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">kubectl get nodes
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="將-worker-nodes-加入-master-叢集">將 worker nodes 加入 master 叢集
-&lt;/h3>&lt;p>輸入 exit 指令離開 master node 。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># 取得 Token&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="在-master-node-建立-k3s">在 master node 建立 k3s
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 安裝 k3s&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">curl -sfL https://get.k3s.io &lt;span class="p">|&lt;/span> sh -
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 查看 k3s 配置文件&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cat /etc/rancher/k3s/k3s.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 安裝後即可使用 kubectl 指令&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo kubectl get nodes
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="將-worker-nodes-加入-master-叢集">將 worker nodes 加入 master 叢集
+&lt;/h3>&lt;p>輸入 exit 指令離開 master node。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># 取得 Token&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">$TOKEN&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">multipass&lt;/span> &lt;span class="n">exec&lt;/span> &lt;span class="nb">k8s-master&lt;/span> &lt;span class="p">--&lt;/span> &lt;span class="nb">cat &lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">var&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">lib&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">rancher&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">k3s&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">server&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="nb">node-token&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c"># 取得 IP&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">$MASTER_IP&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">multipass&lt;/span> &lt;span class="n">info&lt;/span> &lt;span class="nb">k8s-master&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="nb">Select-String&lt;/span> &lt;span class="s2">&amp;#34;IPv4&amp;#34;&lt;/span> &lt;span class="p">|&lt;/span> &lt;span class="nb">ForEach-Object&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="nv">$_&lt;/span> &lt;span class="o">-replace&lt;/span> &lt;span class="s1">&amp;#39;IPv4:\s*&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span> &lt;span class="p">}).&lt;/span>&lt;span class="py">Trim&lt;/span>&lt;span class="p">()&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c"># 將 Token, IP 指定給 worker nodes&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c"># 將 Token、IP 指定給 worker nodes。&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">For&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nv">$f&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="mf">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nv">$f&lt;/span> &lt;span class="o">-le&lt;/span> &lt;span class="mf">2&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nv">$f&lt;/span>&lt;span class="p">++)&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="n">multipass&lt;/span> &lt;span class="n">exec&lt;/span> &lt;span class="s2">&amp;#34;k8s-node&lt;/span>&lt;span class="nv">$f&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="p">--&lt;/span> &lt;span class="n">bash&lt;/span> &lt;span class="n">-c&lt;/span> &lt;span class="s2">&amp;#34;curl -sfL https://get.k3s.io | K3S_URL=&amp;#39;https://&lt;/span>&lt;span class="p">$(&lt;/span>&lt;span class="nv">$MASTER_IP&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="s2">:6443&amp;#39; K3S_TOKEN=&amp;#39;&lt;/span>&lt;span class="nv">$TOKEN&lt;/span>&lt;span class="s2">&amp;#39; sh -&amp;#34;&lt;/span> &lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="建立-master-與-worker-nodes-的-ssh">建立 master 與 worker nodes 的 SSH
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="建立-master-與-worker-nodes-的-ssh">建立 master 與 worker nodes 的 SSH
 &lt;/h3>&lt;p>進入 master node 產生 SSH 密鑰。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 確認 master node 是否有 SSH 密鑰&lt;/span>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 確認 master node 是否有 SSH 密鑰&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cat ~/home/ubuntu~/.ssh/id_rsa.pub
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 若沒有則產生 SSH 密鑰&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ssh-keygen -t rsa -b &lt;span class="m">4096&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 取得 SSH 密鑰&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cat ~/.ssh/id_rsa.pub
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="worker-nodes-調整-ssh-配置">worker nodes 調整 SSH 配置
-&lt;/h3>&lt;p>每個 worker node 都要執行。
-檢查 SSH 服務是否開啟。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">systemctl status ssh
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>調整 SSH 配置。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;span class="lnt">7
-&lt;/span>&lt;span class="lnt">8
-&lt;/span>&lt;span class="lnt">9
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 進入設定檔&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">nano /etc/ssh/sshd_config
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 確保以下設置未被註解（即沒有 #）&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">PubkeyAuthentication yes
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">AuthorizedKeysFile .ssh/authorized_keys
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="worker-nodes-調整-ssh-配置">worker nodes 調整 SSH 配置
+&lt;/h3>&lt;p>每個 worker node 都要執行。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 檢查 SSH 服務是否開啟&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">systemctl status ssh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>調整 SSH 配置。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 進入設定檔，確保以下設置未被註解 (即沒有 #)。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># PubkeyAuthentication yes&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># AuthorizedKeysFile .ssh/authorized_keys&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo nano /etc/ssh/sshd_config
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 重新啟動 SSH 服務&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">systemctl restart ssh
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl restart ssh
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 將 master SSH 密鑰寫入授權金鑰&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="s2">&amp;#34;master SSH 密鑰&amp;#34;&lt;/span> &amp;gt;&amp;gt; ~/.ssh/authorized_keys
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>在 master node 測試 SSH 是否有通。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">ssh &amp;lt;worker nodename&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="將-master-node-的-k3syaml-配置複製到-worker-nodes">將 master node 的 k3s.yaml 配置複製到 worker nodes
-&lt;/h3>&lt;p>進入 master node 複製 k3s.yaml 到 worker nodes 。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;span class="lnt">7
-&lt;/span>&lt;span class="lnt">8
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># SSH 密鑰複製到 root 用戶&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp ~/.ssh/id_rsa /root/.ssh/
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cp ~/.ssh/id_rsa.pub /root/.ssh/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>在 master node 執行。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 測試 SSH 是否有通&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ssh &amp;lt;worker node_name&amp;gt;
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="將-master-node-的-k3syaml-配置複製到-worker-nodes">將 master node 的 k3s.yaml 配置複製到 worker nodes
+&lt;/h3>&lt;p>進入 master node 複製 k3s.yaml 到 worker nodes。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># SSH 密鑰複製到 root 用戶&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp ~/.ssh/id_rsa /root/.ssh/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp ~/.ssh/id_rsa.pub /root/.ssh/
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 設定權限&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">chmod &lt;span class="m">600&lt;/span> /root/.ssh/id_rsa
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">chmod &lt;span class="m">644&lt;/span> /root/.ssh/id_rsa.pub
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo chmod &lt;span class="m">600&lt;/span> /root/.ssh/id_rsa
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo chmod &lt;span class="m">644&lt;/span> /root/.ssh/id_rsa.pub
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 複製 k3s.yaml 到worker nodes&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">scp /etc/rancher/k3s/k3s.yaml ubuntu@k8s-node1:/tmp/k3s.yaml
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>進入 worker nodes ，將 k3s.yaml 的 server 改為 master node 的 IP 。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 檢查目錄是否存在&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo scp /etc/rancher/k3s/k3s.yaml ubuntu@k8s-node1:/tmp/k3s.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>進入 worker nodes ，將 k3s.yaml 的 server 改為 master node 的 IP。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 檢查目錄是否存在&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">ls /etc/rancher/k3s/
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 建立 /etc/rancher/k3s/ 目錄&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mkdir -p /etc/rancher/k3s/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mkdir -p /etc/rancher/k3s/
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 確保 /tmp/k3s.yaml 文件存在後移動文件&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mv /tmp/k3s.yaml /etc/rancher/k3s/k3s.yaml
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 進入 k3s.yaml&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">nano /etc/rancher/k3s/k3s.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mv /tmp/k3s.yaml /etc/rancher/k3s/k3s.yaml
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 修改 server 變數&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">server: https://&amp;lt;master_ip&amp;gt;:6443
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="設定-worker-nodes-的-kubeconfig">設定 worker nodes 的 KUBECONFIG
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># server: https://&amp;lt;master_ip&amp;gt;:6443&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo nano /etc/rancher/k3s/k3s.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="設定-worker-nodes-的-kubeconfig">設定 worker nodes 的 KUBECONFIG
 &lt;/h3>&lt;p>進入 worker node 添加 KUBECONFIG 環境變數。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">nano ~/.bash_profile
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 添加環境變數&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">KUBECONFIG&lt;/span>&lt;span class="o">=&lt;/span>/etc/rancher/k3s/k3s.yaml
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 添加環境變數&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># export KUBECONFIG=/etc/rancher/k3s/k3s.yaml&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">nano ~/.bash_profile
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 使變更生效&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">source&lt;/span> ~/.bash_profile
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="補充-若-master-node-ip-改變則調整-worker-nodes-的設定重新加入叢集">(補充) 若 master node IP 改變，則調整 worker nodes 的設定重新加入叢集
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="補充-若-master-node-ip-改變則調整-worker-nodes-的設定重新加入叢集">(補充) 若 master node IP 改變，則調整 worker nodes 的設定重新加入叢集
 &lt;/h3>&lt;p>進入 worker nodes 編輯環境變數文件。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">nano /etc/systemd/system/k3s-agent.service.env
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">#重新載入和重啟服務&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">systemctl daemon-reload
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">systemctl restart k3s-agent
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="參考">參考
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 修改 K3S_URL 變數&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># K3S_URL=&amp;#39;https://&amp;lt;master_ip&amp;gt;:6443&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo nano /etc/systemd/system/k3s-agent.service.env
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 重新載入和重啟服務&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl daemon-reload
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl restart k3s-agent
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="參考">參考
 &lt;/h2>&lt;ul>
 &lt;li>&lt;a class="link" href="https://canonical.com/multipass" target="_blank" rel="noopener"
 >Multipass&lt;/a>&lt;/li>
@@ -248,132 +171,40 @@
 >k3s&lt;/a>&lt;/li>
 &lt;li>&lt;a class="link" href="https://geekhour.net/2023/12/23/kubernetes/" target="_blank" rel="noopener"
 >Kubernetes 1 小時入門&lt;/a>&lt;/li>
-&lt;/ul></description></item><item><title>部署 Hugo 到 GitHub Pages</title><link>https://april23-artist.github.io/p/deploy-hugo-to-github-pages/</link><pubDate>Tue, 24 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/deploy-hugo-to-github-pages/</guid><description>&lt;h2 id="前言">前言
-&lt;/h2>&lt;p>想紀錄開發筆記，決定透過 GitHub Actions 自動化部署 Hugo 到 GitHub Pages 。&lt;/p>
+&lt;/ul></description></item><item><title>透過 GitHub Actions 自動化部署 Hugo 到 GitHub Pages</title><link>https://april23-artist.github.io/p/deploy-hugo-to-github-pages/</link><pubDate>Tue, 24 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/deploy-hugo-to-github-pages/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>想紀錄開發筆記，決定透過 GitHub Actions 自動化部署 Hugo 到 GitHub Pages。&lt;/p>
 &lt;h2 id="步驟">步驟
 &lt;/h2>&lt;h3 id="windows-安裝-hugo">Windows 安裝 Hugo
-&lt;/h3>&lt;p>安裝 Chocolatey ，使用管理員身分開啟 Windows Terminal 。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">Set-ExecutionPolicy&lt;/span> &lt;span class="n">Bypass&lt;/span> &lt;span class="n">-Scope&lt;/span> &lt;span class="k">Process&lt;/span> &lt;span class="n">-Force&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="no">System.Net.ServicePointManager&lt;/span>&lt;span class="p">]::&lt;/span>&lt;span class="n">SecurityProtocol&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="no">System.Net.ServicePointManager&lt;/span>&lt;span class="p">]::&lt;/span>&lt;span class="n">SecurityProtocol&lt;/span> &lt;span class="o">-bor&lt;/span> &lt;span class="mf">3072&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nb">iex &lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nb">New-Object&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="py">Net&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WebClient&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="py">DownloadString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;https://community.chocolatey.org/install.ps1&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>安裝 Hugo ，並確認 Hugo 版本。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">choco&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="n">hugo&lt;/span>
+&lt;/h3>&lt;p>安裝 Chocolatey ，使用管理員身分開啟 Windows Terminal。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">Set-ExecutionPolicy&lt;/span> &lt;span class="n">Bypass&lt;/span> &lt;span class="n">-Scope&lt;/span> &lt;span class="k">Process&lt;/span> &lt;span class="n">-Force&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="no">System.Net.ServicePointManager&lt;/span>&lt;span class="p">]::&lt;/span>&lt;span class="n">SecurityProtocol&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="no">System.Net.ServicePointManager&lt;/span>&lt;span class="p">]::&lt;/span>&lt;span class="n">SecurityProtocol&lt;/span> &lt;span class="o">-bor&lt;/span> &lt;span class="mf">3072&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nb">iex &lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nb">New-Object&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="py">Net&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WebClient&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="py">DownloadString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;https://community.chocolatey.org/install.ps1&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>安裝 Hugo，並確認 Hugo 版本。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">choco&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="n">hugo&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">choco&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="nb">hugo-extended&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">hugo&lt;/span> &lt;span class="n">version&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="建立-github-repository">建立 GitHub Repository
-&lt;/h3>&lt;p>建立名稱為 &amp;lt;username&amp;gt;.github.io 的 Repo 作為 Hugo 的專案。 &lt;/br>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="建立-github-repository">建立 GitHub Repository
+&lt;/h3>&lt;p>建立名稱為 &amp;lt;user_name&amp;gt;.github.io 的 Repo 作為 Hugo 的專案。 &lt;/br>
 這裡使用的 hugo theme 為 &lt;a class="link" href="https://stack.jimmycai.com/" target="_blank" rel="noopener"
->Stask&lt;/a> ，直接使用 &lt;a class="link" href="https://github.com/CaiJimmy/hugo-theme-stack-starter" target="_blank" rel="noopener"
+>Stask&lt;/a>，直接使用 &lt;a class="link" href="https://github.com/CaiJimmy/hugo-theme-stack-starter" target="_blank" rel="noopener"
 >hugo-theme-stack-stater&lt;/a> 範例來修改。 &lt;/br>
-將 hugo-theme-stack-stater 內的檔案放入 &amp;lt;username&amp;gt;.github.io 。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">clone&lt;/span> &lt;span class="n">https&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="p">//&lt;/span>&lt;span class="n">github&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">CaiJimmy&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="nb">hugo-theme&lt;/span>&lt;span class="n">-stack-starter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="py">git&lt;/span> &lt;span class="nb">hugo-theme&lt;/span>&lt;span class="n">-stack-starter&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>因為環境未安裝 Go 在執行 hugo build 時會出錯，所以要稍微調整。 &lt;/br>
-範例專案沒有 theme ，需下載 &lt;a class="link" href="https://github.com/CaiJimmy/hugo-theme-stack.git" target="_blank" rel="noopener"
+將 hugo-theme-stack-stater 內的檔案放入 &amp;lt;user_name&amp;gt;.github.io。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">clone&lt;/span> &lt;span class="n">https&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="p">//&lt;/span>&lt;span class="n">github&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">CaiJimmy&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="nb">hugo-theme&lt;/span>&lt;span class="n">-stack-starter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="py">git&lt;/span> &lt;span class="nb">hugo-theme&lt;/span>&lt;span class="n">-stack-starter&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>因為環境未安裝 Go 在執行 hugo build 時會出錯，所以要稍微調整。 &lt;/br>
+範例專案沒有 theme，需下載 &lt;a class="link" href="https://github.com/CaiJimmy/hugo-theme-stack.git" target="_blank" rel="noopener"
 >hugo-theme-stack&lt;/a>。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">clone&lt;/span> &lt;span class="n">https&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="p">//&lt;/span>&lt;span class="n">github&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">CaiJimmy&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="nb">hugo-theme&lt;/span>&lt;span class="n">-stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="py">git&lt;/span> &lt;span class="n">themes&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="nb">hugo-theme&lt;/span>&lt;span class="n">-stack&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>將專案內 go.mod, go.sum 刪除。 &lt;/br>
-並調整 config &amp;gt; _default &amp;gt; module.toml 。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-diff" data-lang="diff">&lt;span class="line">&lt;span class="cl">&lt;span class="gd">- path = &amp;#34;github.com/CaiJimmy/hugo-theme-stack/v3&amp;#34;
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">git&lt;/span> &lt;span class="n">clone&lt;/span> &lt;span class="n">https&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="p">//&lt;/span>&lt;span class="n">github&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">com&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="n">CaiJimmy&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="nb">hugo-theme&lt;/span>&lt;span class="n">-stack&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="py">git&lt;/span> &lt;span class="n">themes&lt;/span>&lt;span class="p">/&lt;/span>&lt;span class="nb">hugo-theme&lt;/span>&lt;span class="n">-stack&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>將專案內 go.mod, go.sum 刪除。 &lt;/br>
+並調整 config &amp;gt; _default &amp;gt; module.toml。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-diff" data-lang="diff">&lt;span class="line">&lt;span class="cl">&lt;span class="gd">- path = &amp;#34;github.com/CaiJimmy/hugo-theme-stack/v3&amp;#34;
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gd">&lt;/span>&lt;span class="gi">+ path = &amp;#34;hugo-theme-stack&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>建置並啟動網站，若成功啟動網站即可將專案 push 到 GitHub 。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">hugo&lt;/span> &lt;span class="n">build&lt;/span>
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>建置並啟動網站，若成功啟動網站即可將專案 push 到 GitHub。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">hugo&lt;/span> &lt;span class="n">build&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">hugo&lt;/span> &lt;span class="n">server&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-disableFastRender&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="設定-github-pages">設定 GitHub Pages
-&lt;/h3>&lt;p>新增分支 gh-pages 。 &lt;/br>
-Settings &amp;gt; (Code and automation) Pages &amp;gt; (Build and deployment) Branch 設定為分支 gh-pages/(root) 。&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="設定-github-pages">設定 GitHub Pages
+&lt;/h3>&lt;p>新增分支 gh-pages。 &lt;/br>
+Settings &amp;gt; (Code and automation) Pages &amp;gt; (Build and deployment) Branch 設定為分支 gh-pages/(root)。&lt;/p>
 &lt;h3 id="設定-workflow">設定 Workflow
 &lt;/h3>&lt;p>在分支 main 將範例原本的 .github\workflows\deploy.yaml 內容替換，並 push 到 GitHub ，將會自動化部署到 gh-pages 分支。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;span class="lnt">20
-&lt;/span>&lt;span class="lnt">21
-&lt;/span>&lt;span class="lnt">22
-&lt;/span>&lt;span class="lnt">23
-&lt;/span>&lt;span class="lnt">24
-&lt;/span>&lt;span class="lnt">25
-&lt;/span>&lt;span class="lnt">26
-&lt;/span>&lt;span class="lnt">27
-&lt;/span>&lt;span class="lnt">28
-&lt;/span>&lt;span class="lnt">29
-&lt;/span>&lt;span class="lnt">30
-&lt;/span>&lt;span class="lnt">31
-&lt;/span>&lt;span class="lnt">32
-&lt;/span>&lt;span class="lnt">33
-&lt;/span>&lt;span class="lnt">34
-&lt;/span>&lt;span class="lnt">35
-&lt;/span>&lt;span class="lnt">36
-&lt;/span>&lt;span class="lnt">37
-&lt;/span>&lt;span class="lnt">38
-&lt;/span>&lt;span class="lnt">39
-&lt;/span>&lt;span class="lnt">40
-&lt;/span>&lt;span class="lnt">41
-&lt;/span>&lt;span class="lnt">42
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Deploy Hugo site to GitHub Pages&lt;/span>&lt;span class="w">
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Deploy Hugo site to GitHub Pages&lt;/span>&lt;span class="w">
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># 設定在 `push` 事件觸發時運行工作流。你可以根據需求修改觸發條件。&lt;/span>&lt;span class="w">
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
@@ -415,9 +246,7 @@ Settings &amp;gt; (Code and automation) Pages &amp;gt; (Build and deployment) Br
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">branch&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">gh-pages&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 部署到 gh-pages 分支&lt;/span>&lt;span class="w">
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">folder&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">public&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Hugo 網站的輸出目錄&lt;/span>&lt;span class="w">
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">clean&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">true&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 部署之前清理已有的文件&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="參考">參考
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="參考">參考
 &lt;/h2>&lt;ul>
 &lt;li>&lt;a class="link" href="https://stack.jimmycai.com/" target="_blank" rel="noopener"
 >Stack&lt;/a>&lt;/li>

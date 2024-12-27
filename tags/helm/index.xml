@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Helm on Allen Artist</title><link>https://april23-artist.github.io/tags/helm/</link><description>Recent content in Helm on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 27 Dec 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/tags/helm/index.xml" rel="self" type="application/rss+xml"/><item><title>在 Kubernetes Cluster 安裝 Helm</title><link>https://april23-artist.github.io/p/k8s-install-helm/</link><pubDate>Fri, 27 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/k8s-install-helm/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>Helm 可以將 K8s 資源文件 (Deployment、Service、ConfigMap 等) 應用程式打包為 Chart。
+可以輕鬆安裝和管理 Chart，並且能夠執行升級、回滾、卸載等操作。Helm 減少了手動編寫和管理 K8s 資源的負擔。&lt;/p>
+&lt;h2 id="步驟">步驟
+&lt;/h2>&lt;h3 id="安裝-helm">安裝 Helm
+&lt;/h3>&lt;p>下載 Helm 後目錄會有 helm-v3.16.3-linux-amd64.tar.gz 文件。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">wget https://get.helm.sh/helm-v3.16.3-linux-amd64.tar.gz
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>解壓縮 helm-v3.16.3-linux-amd64.tar.gz 文件。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">tar -zxvf helm-v3.16.3-linux-amd64.tar.gz
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>進入 linux-amd64 目錄，將 linux-amd64 目錄底下的 helm 複製到 /usr/local/bin/。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> linux-amd64/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo cp helm /usr/local/bin/
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>檢查安裝是否完成。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">helm version
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="使用-helm-create-chart-name-新增-chart">使用 helm create &amp;lt;chart-name&amp;gt; 新增 chart
+&lt;/h3>&lt;p>新增 chart 會建立一個 &amp;lt;chart-name&amp;gt; 的資料夾。 &lt;/br>&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">helm create &amp;lt;chart_name&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&amp;lt;chart_name&amp;gt;/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── Chart.yaml &lt;span class="c1"># Helm Chart 的元數據文件，包含了有關 Chart 的基本信息，例如名稱、版本、描述等。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── charts/ &lt;span class="c1"># 用來存放其他 Chart 的依賴包。當你在 Chart.yaml 中指定了依賴關係時，這些依賴會被下載並放到這個目錄中。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">├── templates/ &lt;span class="c1"># Kubernetes 資源的模板文件。&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">└── values.yaml &lt;span class="c1"># 定義了 Helm Chart 中的默認值，它是 Chart 的配置文件。&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="常用-helm-指令">常用 helm 指令
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">helm install &amp;lt;chart_name&amp;gt; &lt;span class="c1"># 安裝&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm uninstall &amp;lt;chart_name&amp;gt; &lt;span class="c1"># 卸載&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm delete &amp;lt;chart_name&amp;gt; &lt;span class="c1"># 刪除&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm upgrade &amp;lt;chart_name&amp;gt; &lt;span class="c1"># 升級&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm &lt;span class="nb">history&lt;/span> &amp;lt;chart_name&amp;gt; &lt;span class="c1"># 歷史紀錄&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm rollback &amp;lt;chart_name&amp;gt; &amp;lt;version&amp;gt; &lt;span class="c1"># 版本回滾&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm upgrade --install &amp;lt;chart_name&amp;gt; &lt;span class="c1"># 安裝或升級&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># -n &amp;lt;namespace&amp;gt; namespace 配置&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># --values &amp;lt;values&amp;gt;.yaml 該文件包含 Helm Chart 配置的默認值&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># -f &amp;lt;overwrite-values&amp;gt;.yaml 讓你覆蓋默認的配置&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm upgrade --install &amp;lt;chart_name&amp;gt; -n &amp;lt;namespace&amp;gt; --values &amp;lt;values&amp;gt;.yaml -f &amp;lt;overwrite-values&amp;gt;.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="參考">參考
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://helm.sh/" target="_blank" rel="noopener"
+>helm&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>
