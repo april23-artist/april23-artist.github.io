@@ -3,12 +3,11 @@ title: 透過 GitHub Actions 自動化部署 Hugo 到 GitHub Pages
 slug: deploy-hugo-to-github-pages
 date: "2024-12-24"
 categories:
-  - "GitHub Actions"
-  - "Hugo"
+  - "DevOps"
 tags:
-  - "PowerShell"
-  - "Yaml"
   - "Hugo"
+  - "GitHub Actions"
+  - "GitHub Pages"
 weight: 1
 ---
 

@@ -5,15 +5,14 @@ date: "2024-12-25"
 categories:
   - "Kubernetes"
 tags:
-  - "PowerShell"
-  - "Bash"
-  - "Kubectl"
+  - "Multipass"
+  - "K3s"
 weight: 1
 ---
 
 ## 前言
 
-Multipass 是輕量化的虛擬機管理工具，選擇搭配 k3s 而不選擇 minikube 是因為 k3s 可以建立多個 node，非常適合用來學習 k8s 的知識。
+Multipass 是輕量化的虛擬機管理工具，選擇搭配 k3s 而不選擇 minikube 是因為 k3s 可以建立多個 node，非常適合用來學習 Kubernetes 的知識。
 
 ## 步驟
 

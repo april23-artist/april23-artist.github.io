@@ -1,11 +1,12 @@
 ---
-title: 在 Kubernetes Cluster 安裝 Network File System
+title: Kubernetes Cluster 安裝 Network File System
 slug: k8s-install-nfs
 date: "2024-12-27"
 categories:
   - "Kubernetes"
 tags:
-  - "Bash"
+  - "NFS"
+  - "Helm"
 weight: 1
 ---
 
@@ -64,6 +65,16 @@ sudo nano /etc/exports
 ```bash
 exportfs -f
 sudo systemctl reload nfs-server
+```
+
+### 安裝 Provisioner 自動建立持久化存儲
+
+```bash
+# 將 Provisioner 安裝在 namespace nfs 中管理
+sudo kubectl create ns nfs
+# 下載 Provisioner
+sudo helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+helm repo update
 ```
 
 ### (補充) 將 nfs server node 共享目錄掛載到其他 node 的指定目錄裡

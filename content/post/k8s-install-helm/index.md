@@ -1,19 +1,18 @@
 ---
-title: 在 Kubernetes Cluster 安裝 Helm
+title: Kubernetes Cluster 安裝 Helm
 slug: k8s-install-helm
 date: "2024-12-27"
 categories:
   - "Kubernetes"
 tags:
-  - "Bash"
   - "Helm"
 weight: 1
 ---
 
 ## 前言
 
-Helm 可以將 K8s 資源文件 (Deployment、Service、ConfigMap 等) 應用程式打包為 Chart。
-可以輕鬆安裝和管理 Chart，並且能夠執行升級、回滾、卸載等操作。Helm 減少了手動編寫和管理 K8s 資源的負擔。
+Helm 可以將 Kubernetes 資源文件 (Deployment、Service、ConfigMap 等) 應用程式打包為 Chart。
+可以輕鬆安裝和管理 Chart，並且能夠執行升級、回滾、卸載等操作。Helm 減少了手動編寫和管理 Kubernetes 資源的負擔。
 
 ## 步驟
 
