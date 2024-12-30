@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jenkins on Allen Artist</title><link>https://april23-artist.github.io/tags/jenkins/</link><description>Recent content in Jenkins on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 30 Dec 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/tags/jenkins/index.xml" rel="self" type="application/rss+xml"/><item><title>Kubernetes Cluster 安裝 Jenkins</title><link>https://april23-artist.github.io/p/k8s-install-jenkins/</link><pubDate>Mon, 30 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/k8s-install-jenkins/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>將 Jenkins 運行在 Kubernetes 上，可以大大提升 Jenkins 的彈性、擴展性和自動化管理。
+Jenkins 可以與 Kubernetes 上的其他服務 (如 Docker、Helm 等) 進行集成，實現更靈活和自動化的 Pipeline 流程&lt;/p>
+&lt;h2 id="步驟">步驟
+&lt;/h2>&lt;h3 id="透過-helm-下載-jenkins">透過 Helm 下載 Jenkins
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">helm repo add jenkinsci https://charts.jenkins.io
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm repo update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 查看 Jenkins repo&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm search repo jenkinsci
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="新增-provisioner-讓建立-jenkins-時透過-storageclass-自動產生存取-pvcpv">新增 Provisioner 讓建立 Jenkins 時透過 StorageClass 自動產生存取 PVC、PV
+&lt;/h3>&lt;p>假設 NFS 服務共享目錄為 /home/nfs/rw/jenkins 。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 加上共享設定&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># /home/nfs/rw/jenkins &amp;lt;nfs_server_ip&amp;gt;.0.0/16(rw,sync,no_subtree_check,no_root_squash)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo nano /etc/exports
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># &amp;lt;nfs_path&amp;gt;: 共享的目錄 /home/nfs/rw/jenkins&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm install &amp;lt;provisioner_name&amp;gt; nfs-subdir-external-provisioner/nfs-subdir-external-provisioner &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --version 4.0.18 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --namespace nfs &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set nfs.server&lt;span class="o">=&lt;/span>&amp;lt;nfs_server_ip&amp;gt; &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set nfs.path&lt;span class="o">=&lt;/span>&amp;lt;nfs_path&amp;gt; &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set storageClass.name&lt;span class="o">=&lt;/span>&amp;lt;storageClass_name&amp;gt; &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --kubeconfig /etc/rancher/k3s/k3s.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="新增-service-account">新增 Service Account
+&lt;/h3>&lt;p>在目錄中新增 &lt;a class="link" href="https://raw.githubusercontent.com/installing-jenkins-on-kubernetes/jenkins-sa.yaml" target="_blank" rel="noopener"
+>jenkins-sa.yaml&lt;/a> 並且建立起來。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo kubectl apply -f jenkins-sa.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="新增-values">新增 Values
+&lt;/h3>&lt;p>在目錄中新增 &lt;a class="link" href="raw.githubusercontent.com/jenkinsci/helm-charts/main/charts/jenkins/values.yaml" >jenkins-values.yaml&lt;/a> 並且調整設定。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># 指定剛才建立的 Provisioner 所提供的 &amp;lt;storageClass_name&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">storageClass&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">&amp;lt;storageClass_name&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">serviceAccount&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">create&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># Service account name is autogenerated by default&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">jenkins&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">annotations&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{}&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="使用-helm-安裝">使用 Helm 安裝
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 安裝 Jenkins&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm install jenkins -n jenkins -f jenkins-values.yaml jenkinsci/jenkins --kubeconfig /etc/rancher/k3s/k3s.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 卸載 Jenkins&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm uninstall jenkins -n jenkins --kubeconfig /etc/rancher/k3s/k3s.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">#取得 admin 用戶的密碼&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">jsonpath&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;{.data.jenkins-admin-password}&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">secret&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>sudo kubectl get secret -n jenkins jenkins -o &lt;span class="nv">jsonpath&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">$jsonpath&lt;/span> --kubeconfig /etc/rancher/k3s/k3s.yaml&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="k">$(&lt;/span>&lt;span class="nb">echo&lt;/span> &lt;span class="nv">$secret&lt;/span> &lt;span class="p">|&lt;/span> base64 --decode&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="參考">參考
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.jenkins.io/" target="_blank" rel="noopener"
+>Jenkins&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.jenkins.io/doc/book/installing/kubernetes/#install-jenkins-with-helm-v3" target="_blank" rel="noopener"
+>Install Jenkins with Helm v3&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://ngrok.com/" target="_blank" rel="noopener"
+>Ngrok&lt;/a>&lt;/li>
+&lt;/ul></description></item></channel></rss>

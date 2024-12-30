@@ -1,6 +1,99 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Kubernetes on Allen Artist</title><link>https://april23-artist.github.io/categories/kubernetes/</link><description>Recent content in Kubernetes on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 27 Dec 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/categories/kubernetes/index.xml" rel="self" type="application/rss+xml"/><item><title>在 Kubernetes Cluster 安裝 Helm</title><link>https://april23-artist.github.io/p/k8s-install-helm/</link><pubDate>Fri, 27 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/k8s-install-helm/</guid><description>&lt;h2 id="前言">前言
-&lt;/h2>&lt;p>Helm 可以將 K8s 資源文件 (Deployment、Service、ConfigMap 等) 應用程式打包為 Chart。
-可以輕鬆安裝和管理 Chart，並且能夠執行升級、回滾、卸載等操作。Helm 減少了手動編寫和管理 K8s 資源的負擔。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Kubernetes on Allen Artist</title><link>https://april23-artist.github.io/categories/kubernetes/</link><description>Recent content in Kubernetes on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 30 Dec 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/categories/kubernetes/index.xml" rel="self" type="application/rss+xml"/><item><title>Kubernetes Cluster 安裝 Jenkins</title><link>https://april23-artist.github.io/p/k8s-install-jenkins/</link><pubDate>Mon, 30 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/k8s-install-jenkins/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>將 Jenkins 運行在 Kubernetes 上，可以大大提升 Jenkins 的彈性、擴展性和自動化管理。
+Jenkins 可以與 Kubernetes 上的其他服務 (如 Docker、Helm 等) 進行集成，實現更靈活和自動化的 Pipeline 流程&lt;/p>
+&lt;h2 id="步驟">步驟
+&lt;/h2>&lt;h3 id="透過-helm-下載-jenkins">透過 Helm 下載 Jenkins
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">helm repo add jenkinsci https://charts.jenkins.io
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm repo update
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 查看 Jenkins repo&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm search repo jenkinsci
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="新增-provisioner-讓建立-jenkins-時透過-storageclass-自動產生存取-pvcpv">新增 Provisioner 讓建立 Jenkins 時透過 StorageClass 自動產生存取 PVC、PV
+&lt;/h3>&lt;p>假設 NFS 服務共享目錄為 /home/nfs/rw/jenkins 。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 加上共享設定&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># /home/nfs/rw/jenkins &amp;lt;nfs_server_ip&amp;gt;.0.0/16(rw,sync,no_subtree_check,no_root_squash)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo nano /etc/exports
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># &amp;lt;nfs_path&amp;gt;: 共享的目錄 /home/nfs/rw/jenkins&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm install &amp;lt;provisioner_name&amp;gt; nfs-subdir-external-provisioner/nfs-subdir-external-provisioner &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --version 4.0.18 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --namespace nfs &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set nfs.server&lt;span class="o">=&lt;/span>&amp;lt;nfs_server_ip&amp;gt; &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set nfs.path&lt;span class="o">=&lt;/span>&amp;lt;nfs_path&amp;gt; &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set storageClass.name&lt;span class="o">=&lt;/span>&amp;lt;storageClass_name&amp;gt; &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --kubeconfig /etc/rancher/k3s/k3s.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="新增-service-account">新增 Service Account
+&lt;/h3>&lt;p>在目錄中新增 &lt;a class="link" href="https://raw.githubusercontent.com/installing-jenkins-on-kubernetes/jenkins-sa.yaml" target="_blank" rel="noopener"
+>jenkins-sa.yaml&lt;/a> 並且建立起來。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo kubectl apply -f jenkins-sa.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="新增-values">新增 Values
+&lt;/h3>&lt;p>在目錄中新增 &lt;a class="link" href="raw.githubusercontent.com/jenkinsci/helm-charts/main/charts/jenkins/values.yaml" >jenkins-values.yaml&lt;/a> 並且調整設定。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># 指定剛才建立的 Provisioner 所提供的 &amp;lt;storageClass_name&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">storageClass&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">&amp;lt;storageClass_name&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">serviceAccount&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">create&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="kc">false&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># Service account name is autogenerated by default&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">jenkins&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">annotations&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{}&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="使用-helm-安裝">使用 Helm 安裝
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 安裝 Jenkins&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm install jenkins -n jenkins -f jenkins-values.yaml jenkinsci/jenkins --kubeconfig /etc/rancher/k3s/k3s.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 卸載 Jenkins&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm uninstall jenkins -n jenkins --kubeconfig /etc/rancher/k3s/k3s.yaml
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">#取得 admin 用戶的密碼&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">jsonpath&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;{.data.jenkins-admin-password}&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">secret&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>sudo kubectl get secret -n jenkins jenkins -o &lt;span class="nv">jsonpath&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">$jsonpath&lt;/span> --kubeconfig /etc/rancher/k3s/k3s.yaml&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="k">$(&lt;/span>&lt;span class="nb">echo&lt;/span> &lt;span class="nv">$secret&lt;/span> &lt;span class="p">|&lt;/span> base64 --decode&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="參考">參考
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://www.jenkins.io/" target="_blank" rel="noopener"
+>Jenkins&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.jenkins.io/doc/book/installing/kubernetes/#install-jenkins-with-helm-v3" target="_blank" rel="noopener"
+>Install Jenkins with Helm v3&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://ngrok.com/" target="_blank" rel="noopener"
+>Ngrok&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>Kubernetes Provisioner 自動化管理持久化存儲資源</title><link>https://april23-artist.github.io/p/k8s-provisioner/</link><pubDate>Mon, 30 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/k8s-provisioner/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>Provisioner 是 Kubernetes 中的一個組件，用於自動化管理持久化存儲資源。它的主要用途包括:&lt;/p>
+&lt;ul>
+&lt;li>自動創建存儲資源: 在 K8es 中創建 PersistentVolumeClaim (PVC) 時，Provisioner 會自動創建對應的 PersistentVolume (PV)。&lt;/li>
+&lt;li>簡化存儲管理：通過使用 Provisioner，無需手動管理存儲資源，減少運維的複雜度。&lt;/li>
+&lt;li>動態配置存儲：Provisioner 支持動態配置存儲資源，根據應用需求自動調整存儲大小和配置。&lt;/li>
+&lt;li>多種存儲後端支持：不同的 Provisioner 可以支持不同的存儲後端，如 NFS、Ceph、AWS EBS 等，提供靈活的存儲選擇。&lt;/li>
+&lt;/ul>
+&lt;h2 id="步驟">步驟
+&lt;/h2>&lt;p>假設 NFS 服務共享目錄為 /home/nfs/rw/mssql 。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 加上共享設定&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># /home/nfs/rw/mssql &amp;lt;nfs_server_ip&amp;gt;.0.0/16(rw,sync,no_subtree_check,no_root_squash)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo nano /etc/exports
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="建立-provisioner-並設定-storageclass-的名稱">建立 Provisioner 並設定 StorageClass 的名稱
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># &amp;lt;nfs_path&amp;gt;: 共享的目錄 /home/nfs/rw/mssql&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm install &amp;lt;provisioner_name&amp;gt; nfs-subdir-external-provisioner/nfs-subdir-external-provisioner &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --version 4.0.18 &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --namespace nfs &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set nfs.server&lt;span class="o">=&lt;/span>&amp;lt;nfs_server_ip&amp;gt; &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set nfs.path&lt;span class="o">=&lt;/span>&amp;lt;nfs_path&amp;gt; &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set storageClass.name&lt;span class="o">=&lt;/span>&amp;lt;storageClass_name&amp;gt; &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --kubeconfig /etc/rancher/k3s/k3s.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="在-statefulset-裡設定使用-storageclass_name">在 Statefulset 裡設定使用 &amp;lt;storageClass_name&amp;gt;
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">StatefulSet&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">template&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">containers&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">volumeMounts&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">mountPath&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/var/opt/mssql&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">volumeClaimTemplates&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">metadata&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{{&lt;span class="w"> &lt;/span>&lt;span class="l">.Release.Name }}&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">storageClassName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">&amp;lt;storageClass_name&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">accessModes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">ReadWriteMany&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">resources&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">requests&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">storage&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">1Gi&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Kubernetes Cluster 安裝 Helm</title><link>https://april23-artist.github.io/p/k8s-install-helm/</link><pubDate>Fri, 27 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/k8s-install-helm/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>Helm 可以將 Kubernetes 資源文件 (Deployment、Service、ConfigMap 等) 應用程式打包為 Chart。
+可以輕鬆安裝和管理 Chart，並且能夠執行升級、回滾、卸載等操作。Helm 減少了手動編寫和管理 Kubernetes 資源的負擔。&lt;/p>
 &lt;h2 id="步驟">步驟
 &lt;/h2>&lt;h3 id="安裝-helm">安裝 Helm
 &lt;/h3>&lt;p>下載 Helm 後目錄會有 helm-v3.16.3-linux-amd64.tar.gz 文件。&lt;/p>
@@ -38,7 +131,7 @@
 &lt;/h2>&lt;ul>
 &lt;li>&lt;a class="link" href="https://helm.sh/" target="_blank" rel="noopener"
 >helm&lt;/a>&lt;/li>
-&lt;/ul></description></item><item><title>在 Kubernetes Cluster 安裝 Network File System</title><link>https://april23-artist.github.io/p/k8s-install-nfs/</link><pubDate>Fri, 27 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/k8s-install-nfs/</guid><description>&lt;h2 id="前言">前言
+&lt;/ul></description></item><item><title>Kubernetes Cluster 安裝 Network File System</title><link>https://april23-artist.github.io/p/k8s-install-nfs/</link><pubDate>Fri, 27 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/k8s-install-nfs/</guid><description>&lt;h2 id="前言">前言
 &lt;/h2>&lt;p>NFS (Network File System) 是一種共享文件系統，它允許不同的主機或容器之間共享文件或資料夾。 &lt;/br>
 NFS 是一種網路檔案系統協定，可以讓多個容器和 Pod 在不同的節點上訪問同一份數據，這對於需要跨多個 Pod 或節點持久儲存數據的應用非常有用。&lt;/p>
 &lt;h2 id="步驟">步驟
@@ -66,6 +159,12 @@ NFS 是一種網路檔案系統協定，可以讓多個容器和 Pod 在不同�
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>重新加載。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">exportfs -f
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl reload nfs-server
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="安裝-provisioner-自動建立持久化存儲">安裝 Provisioner 自動建立持久化存儲
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 將 Provisioner 安裝在 namespace nfs 中管理&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo kubectl create ns nfs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 下載 Provisioner&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm repo update
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="補充-將-nfs-server-node-共享目錄掛載到其他-node-的指定目錄裡">(補充) 將 nfs server node 共享目錄掛載到其他 node 的指定目錄裡
 &lt;/h3>&lt;p>進入其他 node，選擇要同步共享目錄的資料夾。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo mkdir -p /mnt/nfs/rw
@@ -73,7 +172,7 @@ NFS 是一種網路檔案系統協定，可以讓多個容器和 Pod 在不同�
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 取消掛載&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo umount /mnt/nfs/rw
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Multipass 搭配 k3s 建立 Kubernetes Cluster</title><link>https://april23-artist.github.io/p/multipass-k3s/</link><pubDate>Wed, 25 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/multipass-k3s/</guid><description>&lt;h2 id="前言">前言
-&lt;/h2>&lt;p>Multipass 是輕量化的虛擬機管理工具，選擇搭配 k3s 而不選擇 minikube 是因為 k3s 可以建立多個 node，非常適合用來學習 k8s 的知識。&lt;/p>
+&lt;/h2>&lt;p>Multipass 是輕量化的虛擬機管理工具，選擇搭配 k3s 而不選擇 minikube 是因為 k3s 可以建立多個 node，非常適合用來學習 Kubernetes 的知識。&lt;/p>
 &lt;h2 id="步驟">步驟
 &lt;/h2>&lt;h3 id="安裝-multipass">安裝 Multipass
 &lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">choco&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="n">multipass&lt;/span>
