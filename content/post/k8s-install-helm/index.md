@@ -68,7 +68,7 @@ helm history <chart_name>            # 歷史紀錄
 helm rollback <chart_name> <version> # 版本回滾
 helm upgrade --install <chart_name>  # 安裝或升級
 
-# -n <namespace> namespace 配置
+# -n <namespace> 命名空間配置
 # --values <values>.yaml 該文件包含 Helm Chart 配置的默認值
 # -f <overwrite-values>.yaml 讓你覆蓋默認的配置
 helm upgrade --install <chart_name> -n <namespace> --values <values>.yaml -f <overwrite-values>.yaml

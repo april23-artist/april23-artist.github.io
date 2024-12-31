@@ -56,7 +56,7 @@ sudo helm install <provisioner_name> nfs-subdir-external-provisioner/nfs-subdir-
 
 ### 新增 Service Account
 
-新增 Namespace jenkins 將 Jenkins 相關服務都裝在此 Namespace。
+新增 jenkins 命名空間將 Jenkins 相關服務都裝在此命名空間。
 
 ```bash
 sudo kubectl create ns jenkins

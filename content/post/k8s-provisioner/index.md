@@ -25,7 +25,7 @@ Provisioner 是 Kubernetes 中的一個組件，用於自動化管理持久化�
 ### 安裝 Provisioner 自動建立持久化存儲
 
 ```bash
-# 將 Provisioner 安裝在 Namespace nfs 中管理
+# 將 Provisioner 安裝在 nfs 命名空間中管理
 sudo kubectl create ns nfs
 # 下載 Provisioner
 sudo helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
