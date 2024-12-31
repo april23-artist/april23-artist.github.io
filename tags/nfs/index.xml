@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>NFS on Allen Artist</title><link>https://april23-artist.github.io/tags/nfs/</link><description>Recent content in NFS on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 30 Dec 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/tags/nfs/index.xml" rel="self" type="application/rss+xml"/><item><title>Kubernetes Cluster 安裝 Jenkins</title><link>https://april23-artist.github.io/p/k8s-install-jenkins/</link><pubDate>Mon, 30 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/k8s-install-jenkins/</guid><description>&lt;h2 id="前言">前言
 &lt;/h2>&lt;p>將 Jenkins 運行在 Kubernetes 上，可以大大提升 Jenkins 的彈性、擴展性和自動化管理。
-Jenkins 可以與 Kubernetes 上的其他服務 (如 Docker、Helm 等) 進行集成，實現更靈活和自動化的 Pipeline 流程&lt;/p>
+Jenkins 可以與 Kubernetes 上的其他服務 (如 Docker、Helm 等) 進行集成，實現更靈活和自動化的 Pipeline 流程。&lt;/p>
 &lt;h2 id="步驟">步驟
 &lt;/h2>&lt;h3 id="透過-helm-下載-jenkins">透過 Helm 下載 Jenkins
-&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">helm repo add jenkinsci https://charts.jenkins.io
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm repo update
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo helm repo add jenkinsci https://charts.jenkins.io
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm repo update
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 查看 Jenkins repo&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm search repo jenkinsci
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm search repo jenkinsci
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="新增-provisioner-讓建立-jenkins-時透過-storageclass-自動產生存取-pvcpv">新增 Provisioner 讓建立 Jenkins 時透過 StorageClass 自動產生存取 PVC、PV
-&lt;/h3>&lt;p>假設 NFS 服務共享目錄為 /home/nfs/rw/jenkins 。&lt;/p>
+&lt;/h3>&lt;p>在 NFS Node 新增 /home/nfs/rw/jenkins，並且將其加入共享目錄。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 加上共享設定&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># /home/nfs/rw/jenkins &amp;lt;nfs_server_ip&amp;gt;.0.0/16(rw,sync,no_subtree_check,no_root_squash)&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo nano /etc/exports
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 重新加載&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">exportfs -f
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl reload nfs-server
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># &amp;lt;nfs_path&amp;gt;: 共享的目錄 /home/nfs/rw/jenkins&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm install &amp;lt;provisioner_name&amp;gt; nfs-subdir-external-provisioner/nfs-subdir-external-provisioner &lt;span class="se">\
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --version 4.0.18 &lt;span class="se">\
@@ -21,11 +24,14 @@ Jenkins 可以與 Kubernetes 上的其他服務 (如 Docker、Helm 等) 進行�
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set storageClass.name&lt;span class="o">=&lt;/span>&amp;lt;storageClass_name&amp;gt; &lt;span class="se">\
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --kubeconfig /etc/rancher/k3s/k3s.yaml
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="新增-service-account">新增 Service Account
-&lt;/h3>&lt;p>在目錄中新增 &lt;a class="link" href="https://raw.githubusercontent.com/installing-jenkins-on-kubernetes/jenkins-sa.yaml" target="_blank" rel="noopener"
+&lt;/h3>&lt;p>新增 Namespace jenkins 將 Jenkins 相關服務都裝在此 Namespace。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo kubectl create ns jenkins
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>在目錄中新增 &lt;a class="link" href="https://raw.githubusercontent.com/jenkins-infra/jenkins.io/master/content/doc/tutorials/kubernetes/installing-jenkins-on-kubernetes/jenkins-sa.yaml" target="_blank" rel="noopener"
 >jenkins-sa.yaml&lt;/a> 並且建立起來。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo kubectl apply -f jenkins-sa.yaml
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="新增-values">新增 Values
-&lt;/h3>&lt;p>在目錄中新增 &lt;a class="link" href="raw.githubusercontent.com/jenkinsci/helm-charts/main/charts/jenkins/values.yaml" >jenkins-values.yaml&lt;/a> 並且調整設定。&lt;/p>
+&lt;/h3>&lt;p>在目錄中新增 &lt;a class="link" href="https://raw.githubusercontent.com/jenkinsci/helm-charts/main/charts/jenkins/values.yaml" target="_blank" rel="noopener"
+>jenkins-values.yaml&lt;/a> 並且調整設定。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># 指定剛才建立的 Provisioner 所提供的 &amp;lt;storageClass_name&amp;gt;&lt;/span>&lt;span class="w">
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">storageClass&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">&amp;lt;storageClass_name&amp;gt;&lt;/span>&lt;span class="w">
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
@@ -34,15 +40,31 @@ Jenkins 可以與 Kubernetes 上的其他服務 (如 Docker、Helm 等) 進行�
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="c"># Service account name is autogenerated by default&lt;/span>&lt;span class="w">
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">jenkins&lt;/span>&lt;span class="w">
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">annotations&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>{}&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="使用-helm-安裝">使用 Helm 安裝
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="使用-helm-安裝-jenkins">使用 Helm 安裝 Jenkins
 &lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 安裝 Jenkins&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm install jenkins -n jenkins -f jenkins-values.yaml jenkinsci/jenkins --kubeconfig /etc/rancher/k3s/k3s.yaml
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 卸載 Jenkins&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm uninstall jenkins -n jenkins --kubeconfig /etc/rancher/k3s/k3s.yaml
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">#取得 admin 用戶的密碼&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">jsonpath&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;{.data.jenkins-admin-password}&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="將-service-改為-type-nodeport-方便測試">將 Service 改為 Type: NodePort 方便測試
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 進入 service 修改&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo kubectl edit svc jenkins -n jenkins
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>指定對外的 Port，並且將 Type 改為 NodePort 即可使用 &amp;lt;node_ip&amp;gt;:&amp;lt;port&amp;gt; 連線。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ports&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">nodePort&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">30020&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">NodePort&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>取得 admin 用戶的密碼。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nv">jsonpath&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;{.data.jenkins-admin-password}&amp;#34;&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nv">secret&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="k">$(&lt;/span>sudo kubectl get secret -n jenkins jenkins -o &lt;span class="nv">jsonpath&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">$jsonpath&lt;/span> --kubeconfig /etc/rancher/k3s/k3s.yaml&lt;span class="k">)&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">echo&lt;/span> &lt;span class="k">$(&lt;/span>&lt;span class="nb">echo&lt;/span> &lt;span class="nv">$secret&lt;/span> &lt;span class="p">|&lt;/span> base64 --decode&lt;span class="k">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="補充-使用-ngrok-將-jenkins-node_ipport-公開就可以與其他服務對接">(補充) 使用 Ngrok 將 Jenkins &amp;lt;node_ip&amp;gt;:&amp;lt;port&amp;gt; 公開就可以與其他服務對接
+&lt;/h3>&lt;p>安裝 Ngrok。
+進入官網 &lt;a class="link" href="https://ngrok.com/" target="_blank" rel="noopener"
+>Ngrok&lt;/a> 註冊帳號候登入，即可在 Getting Started &amp;gt; Step &amp;amp; Installation 取得安裝步驟。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">choco&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="n">ngrok&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">ngrok&lt;/span> &lt;span class="n">config&lt;/span> &lt;span class="nb">add-authtoken&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">auth_token&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>執行 Ngrok 將 Jenkins &amp;lt;node_ip&amp;gt;:&amp;lt;port&amp;gt; 公開。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">ngrok&lt;/span> &lt;span class="n">http&lt;/span> &lt;span class="n">http&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="p">//&amp;lt;&lt;/span>&lt;span class="n">node_ip&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">port&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="參考">參考
 &lt;/h2>&lt;ul>
 &lt;li>&lt;a class="link" href="https://www.jenkins.io/" target="_blank" rel="noopener"
@@ -60,12 +82,22 @@ Jenkins 可以與 Kubernetes 上的其他服務 (如 Docker、Helm 等) 進行�
 &lt;li>多種存儲後端支持：不同的 Provisioner 可以支持不同的存儲後端，如 NFS、Ceph、AWS EBS 等，提供靈活的存儲選擇。&lt;/li>
 &lt;/ul>
 &lt;h2 id="步驟">步驟
-&lt;/h2>&lt;p>假設 NFS 服務共享目錄為 /home/nfs/rw/mssql 。&lt;/p>
+&lt;/h2>&lt;h3 id="安裝-provisioner-自動建立持久化存儲">安裝 Provisioner 自動建立持久化存儲
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 將 Provisioner 安裝在 Namespace nfs 中管理&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo kubectl create ns nfs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 下載 Provisioner&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm repo update
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="建立-provisioner-並設定-storageclass-的名稱">建立 Provisioner 並設定 StorageClass 的名稱
+&lt;/h3>&lt;p>假設 NFS 服務共享目錄為 /home/nfs/rw/mssql 。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 加上共享設定&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># /home/nfs/rw/mssql &amp;lt;nfs_server_ip&amp;gt;.0.0/16(rw,sync,no_subtree_check,no_root_squash)&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo nano /etc/exports
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="建立-provisioner-並設定-storageclass-的名稱">建立 Provisioner 並設定 StorageClass 的名稱
-&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># &amp;lt;nfs_path&amp;gt;: 共享的目錄 /home/nfs/rw/mssql&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 重新加載&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">exportfs -f
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl reload nfs-server
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>建立 Provisioner 並設定 StorageClass 的名稱。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># &amp;lt;nfs_path&amp;gt;: 共享的目錄 /home/nfs/rw/&amp;lt;file_name&amp;gt;&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm install &amp;lt;provisioner_name&amp;gt; nfs-subdir-external-provisioner/nfs-subdir-external-provisioner &lt;span class="se">\
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --version 4.0.18 &lt;span class="se">\
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --namespace nfs &lt;span class="se">\
@@ -95,7 +127,7 @@ Jenkins 可以與 Kubernetes 上的其他服務 (如 Docker、Helm 等) 進行�
 &lt;/h2>&lt;p>NFS (Network File System) 是一種共享文件系統，它允許不同的主機或容器之間共享文件或資料夾。 &lt;/br>
 NFS 是一種網路檔案系統協定，可以讓多個容器和 Pod 在不同的節點上訪問同一份數據，這對於需要跨多個 Pod 或節點持久儲存數據的應用非常有用。&lt;/p>
 &lt;h2 id="步驟">步驟
-&lt;/h2>&lt;p>每個 node 都需要安裝。&lt;/p>
+&lt;/h2>&lt;p>每個 Node 都需要安裝。&lt;/p>
 &lt;h3 id="安裝-nfs-客戶端工具-nfs-common">安裝 NFS 客戶端工具 (nfs-common)
 &lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 更新包列表&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo apt update
@@ -109,9 +141,12 @@ NFS 是一種網路檔案系統協定，可以讓多個容器和 Pod 在不同�
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl status nfs-kernel-server
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 檢查 NFS 客戶端，使用 showmount 命令查看 NFS 伺服器共享的目錄&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">showmount -e &amp;lt;nfs_server_ip&amp;gt;
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="選擇適合共享-nfs-目錄的-node-適合資料存儲的配置的-node">選擇適合共享 nfs 目錄的 node (適合資料存儲的配置的 node)
-&lt;/h3>&lt;p>進入 nfs server node，這邊選擇 /home/nfs/rw 作為共享目錄。&lt;/p>
-&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo mkdir /home/nfs/rw
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="選擇適合共享-nfs-目錄的-node-適合資料存儲的配置的-node">選擇適合共享 NFS 目錄的 Node (適合資料存儲的配置的 Node)
+&lt;/h3>&lt;p>進入 NFS Node，這邊選擇 /home/nfs/rw 作為共享目錄。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> /home
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mkdir nfs
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">cd&lt;/span> nfs/
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mkdir rw
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>設置共享目錄。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 加上共享設定&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># /home/nfs/rw &amp;lt;nfs_server_ip&amp;gt;.0.0/16(rw,sync,no_subtree_check,no_root_squash)&lt;/span>
@@ -119,14 +154,8 @@ NFS 是一種網路檔案系統協定，可以讓多個容器和 Pod 在不同�
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>重新加載。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">exportfs -f
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo systemctl reload nfs-server
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="安裝-provisioner-自動建立持久化存儲">安裝 Provisioner 自動建立持久化存儲
-&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 將 Provisioner 安裝在 namespace nfs 中管理&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo kubectl create ns nfs
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 下載 Provisioner&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">helm repo update
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="補充-將-nfs-server-node-共享目錄掛載到其他-node-的指定目錄裡">(補充) 將 nfs server node 共享目錄掛載到其他 node 的指定目錄裡
-&lt;/h3>&lt;p>進入其他 node，選擇要同步共享目錄的資料夾。&lt;/p>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="補充-將-nfs-node-共享目錄掛載到其他-node-的指定目錄裡">(補充) 將 NFS Node 共享目錄掛載到其他 Node 的指定目錄裡
+&lt;/h3>&lt;p>進入其他 Node，選擇要同步共享目錄的資料夾。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo mkdir -p /mnt/nfs/rw
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo mount -t nfs &amp;lt;nfs_server_ip&amp;gt;:/home/nfs/rw /mnt/nfs/rw
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 取消掛載&lt;/span>

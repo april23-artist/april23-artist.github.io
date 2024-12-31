@@ -2,7 +2,7 @@
 &lt;/h2>&lt;p>想紀錄開發筆記，決定透過 GitHub Actions 自動化部署 Hugo 到 GitHub Pages。&lt;/p>
 &lt;h2 id="步驟">步驟
 &lt;/h2>&lt;h3 id="windows-安裝-hugo">Windows 安裝 Hugo
-&lt;/h3>&lt;p>安裝 Chocolatey ，使用管理員身分開啟 Windows Terminal。&lt;/p>
+&lt;/h3>&lt;p>安裝 Chocolatey，使用管理員身分開啟 Windows Terminal。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="nb">Set-ExecutionPolicy&lt;/span> &lt;span class="n">Bypass&lt;/span> &lt;span class="n">-Scope&lt;/span> &lt;span class="k">Process&lt;/span> &lt;span class="n">-Force&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="no">System.Net.ServicePointManager&lt;/span>&lt;span class="p">]::&lt;/span>&lt;span class="n">SecurityProtocol&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="no">System.Net.ServicePointManager&lt;/span>&lt;span class="p">]::&lt;/span>&lt;span class="n">SecurityProtocol&lt;/span> &lt;span class="o">-bor&lt;/span> &lt;span class="mf">3072&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="nb">iex &lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="nb">New-Object&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="py">Net&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WebClient&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="py">DownloadString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;https://community.chocolatey.org/install.ps1&amp;#39;&lt;/span>&lt;span class="p">))&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>安裝 Hugo，並確認 Hugo 版本。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">choco&lt;/span> &lt;span class="n">install&lt;/span> &lt;span class="n">hugo&lt;/span>
@@ -10,7 +10,7 @@
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">hugo&lt;/span> &lt;span class="n">version&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="建立-github-repository">建立 GitHub Repository
 &lt;/h3>&lt;p>建立名稱為 &amp;lt;user_name&amp;gt;.github.io 的 Repo 作為 Hugo 的專案。 &lt;/br>
-這裡使用的 hugo theme 為 &lt;a class="link" href="https://stack.jimmycai.com/" target="_blank" rel="noopener"
+這裡套用的 hugo theme 為 &lt;a class="link" href="https://stack.jimmycai.com/" target="_blank" rel="noopener"
 >Stask&lt;/a>，直接使用 &lt;a class="link" href="https://github.com/CaiJimmy/hugo-theme-stack-starter" target="_blank" rel="noopener"
 >hugo-theme-stack-stater&lt;/a> 範例來修改。 &lt;/br>
 將 hugo-theme-stack-stater 內的檔案放入 &amp;lt;user_name&amp;gt;.github.io。&lt;/p>
@@ -27,7 +27,7 @@
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">hugo&lt;/span> &lt;span class="n">build&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">hugo&lt;/span> &lt;span class="n">server&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="n">-disableFastRender&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="設定-github-pages">設定 GitHub Pages
-&lt;/h3>&lt;p>新增分支 gh-pages。 &lt;/br>
+&lt;/h3>&lt;p>Repo 新增分支 gh-pages。 &lt;/br>
 Settings &amp;gt; (Code and automation) Pages &amp;gt; (Build and deployment) Branch 設定為分支 gh-pages/(root)。&lt;/p>
 &lt;h3 id="設定-workflow">設定 Workflow
 &lt;/h3>&lt;p>在分支 main 將範例原本的 .github\workflows\deploy.yaml 內容替換，並 push 到 GitHub ，將會自動化部署到 gh-pages 分支。&lt;/p>
