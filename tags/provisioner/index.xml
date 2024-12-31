@@ -24,7 +24,7 @@ Jenkins 可以與 Kubernetes 上的其他服務 (如 Docker、Helm 等) 進行�
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set storageClass.name&lt;span class="o">=&lt;/span>&amp;lt;storageClass_name&amp;gt; &lt;span class="se">\
 &lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --kubeconfig /etc/rancher/k3s/k3s.yaml
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="新增-service-account">新增 Service Account
-&lt;/h3>&lt;p>新增 Namespace jenkins 將 Jenkins 相關服務都裝在此 Namespace。&lt;/p>
+&lt;/h3>&lt;p>新增 jenkins 命名空間將 Jenkins 相關服務都裝在此命名空間。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo kubectl create ns jenkins
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>在目錄中新增 &lt;a class="link" href="https://raw.githubusercontent.com/jenkins-infra/jenkins.io/master/content/doc/tutorials/kubernetes/installing-jenkins-on-kubernetes/jenkins-sa.yaml" target="_blank" rel="noopener"
 >jenkins-sa.yaml&lt;/a> 並且建立起來。&lt;/p>
@@ -83,7 +83,7 @@ Jenkins 可以與 Kubernetes 上的其他服務 (如 Docker、Helm 等) 進行�
 &lt;/ul>
 &lt;h2 id="步驟">步驟
 &lt;/h2>&lt;h3 id="安裝-provisioner-自動建立持久化存儲">安裝 Provisioner 自動建立持久化存儲
-&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 將 Provisioner 安裝在 Namespace nfs 中管理&lt;/span>
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 將 Provisioner 安裝在 nfs 命名空間中管理&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo kubectl create ns nfs
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 下載 Provisioner&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/

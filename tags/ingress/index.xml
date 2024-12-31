@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Ingress on Allen Artist</title><link>https://april23-artist.github.io/tags/ingress/</link><description>Recent content in Ingress on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 31 Dec 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/tags/ingress/index.xml" rel="self" type="application/rss+xml"/><item><title>Kubernetes Cluster 安裝 Ingress</title><link>https://april23-artist.github.io/p/k8s-install-ingress/</link><pubDate>Tue, 31 Dec 2024 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/k8s-install-ingress/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>Kubernetes Ingress 是一種用於管理外部訪問 Kubernetes 叢集中服務的方式。它提供了 HTTP 和 HTTPS 路由功能，允許外部用戶通過單一 IP 地址訪問多個服務。&lt;/p>
+&lt;p>主要功能:&lt;/p>
+&lt;ul>
+&lt;li>路由：根據 HTTP/HTTPS 請求的 URL 路徑或主機名，將流量路由到不同的服務。&lt;/li>
+&lt;li>負載均衡：在多個後端服務實例之間分配流量，實現負載均衡。&lt;/li>
+&lt;li>SSL/TLS 終止：處理 HTTPS 請求，提供 SSL/TLS 終止功能。&lt;/li>
+&lt;li>虛擬主機：支持基於主機名的虛擬主機配置，允許多個域名共享同一個 IP 地址。&lt;/li>
+&lt;/ul>
+&lt;p>Ingress 需要搭配 Ingress Controller 使用，是一個負責處理 Ingress 資源的控制器。常見的 Ingress Controller 有:&lt;/p>
+&lt;ul>
+&lt;li>Nginx&lt;/li>
+&lt;li>Traefik&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Ingress 是一種抽象，nginx則是實作抽象&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>Ingress 用於定義如何將外部流量路由到 Kubernetes 叢集中的服務。&lt;/li>
+&lt;li>Nginx 實作這個抽象的工具，作為 Ingress Controller 來處理和路由流量。&lt;/li>
+&lt;/ul>
+&lt;h2 id="步驟">步驟
+&lt;/h2>&lt;h3 id="檢查-kube-system-命名空間中是否已經有預設的-traefik-ingress-controller">檢查 kube-system 命名空間中是否已經有預設的 Traefik Ingress Controller
+&lt;/h3>&lt;p>因為預設的 Traefik 會占用預設的 80 和 443 端口，所以在安裝 Ingress Controller 之前應該先移除它。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 檢查 kube-system 命名空間中是否有 Traefik&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo kubectl get all -n kube-system &lt;span class="p">|&lt;/span> grep traefik
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 如果有 Traefik 移除它&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo kubectl delete deployment traefik -n kube-system
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo kubectl delete service traefik -n kube-system
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="透過-helm-安裝-ingress">透過 Helm 安裝 Ingress
+&lt;/h3>&lt;p>下載 ingress-nginx。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo helm repo update
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>加上 ingress-nginx 命名空間，以及指定 Node 加上 Label，讓資源建立在上面。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo kubectl create ns ingress-nginx
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">sudo kubectl label node k8s-node1 &lt;span class="nv">ingress&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>安裝 ingress-nginx。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">sudo helm install ingress-nginx ingress-nginx/ingress-nginx &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --namespace ingress-nginx &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set &lt;span class="nv">kind&lt;/span>&lt;span class="o">=&lt;/span>DaemonSet &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set nodeSelector.&lt;span class="s2">&amp;#34;kubernetes\.io/os&amp;#34;&lt;/span>&lt;span class="o">=&lt;/span>linux &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --set nodeSelector.ingress&lt;span class="o">=&lt;/span>&lt;span class="nb">true&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --kubeconfig /etc/rancher/k3s/k3s.yaml
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="範例">範例
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">apiVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">networking.k8s.io/v1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Ingress&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">metadata&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">test-ingress&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ingressClassName&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s2">&amp;#34;nginx&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">rules&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">host&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">test.com&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># Domain 配置&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">http&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">paths&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">pathType&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Prefix&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">backend&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">service&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">test-svc&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 代理到哪個 Service&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">port&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">number&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">80&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">path&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">/&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>
