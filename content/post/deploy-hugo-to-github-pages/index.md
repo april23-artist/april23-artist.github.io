@@ -8,6 +8,7 @@ tags:
   - "Hugo"
   - "GitHub Actions"
   - "GitHub Pages"
+  - "Chocolatey"
 weight: 1
 ---
 
@@ -19,7 +20,7 @@ weight: 1
 
 ### Windows 安裝 Hugo
 
-安裝 Chocolatey ，使用管理員身分開啟 Windows Terminal。
+安裝 Chocolatey，使用管理員身分開啟 Windows Terminal。
 
 ```powershell
 Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
@@ -36,7 +37,7 @@ hugo version
 ### 建立 GitHub Repository
 
 建立名稱為 \<user_name\>.github.io 的 Repo 作為 Hugo 的專案。 </br>
-這裡使用的 hugo theme 為 [Stask](https://stack.jimmycai.com/)，直接使用 [hugo-theme-stack-stater](https://github.com/CaiJimmy/hugo-theme-stack-starter) 範例來修改。 </br>
+這裡套用的 hugo theme 為 [Stask](https://stack.jimmycai.com/)，直接使用 [hugo-theme-stack-stater](https://github.com/CaiJimmy/hugo-theme-stack-starter) 範例來修改。 </br>
 將 hugo-theme-stack-stater 內的檔案放入 \<user_name\>.github.io。
 
 ```powershell
@@ -67,7 +68,7 @@ hugo server --disableFastRender
 
 ### 設定 GitHub Pages
 
-新增分支 gh-pages。 </br>
+Repo 新增分支 gh-pages。 </br>
 Settings > (Code and automation) Pages > (Build and deployment) Branch 設定為分支 gh-pages/(root)。
 
 ### 設定 Workflow

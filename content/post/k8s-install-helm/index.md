@@ -76,4 +76,4 @@ helm upgrade --install <chart_name> -n <namespace> --values <values>.yaml -f <ov
 
 ## 參考
 
-- [helm](https://helm.sh/)
+- [Helm](https://helm.sh/)

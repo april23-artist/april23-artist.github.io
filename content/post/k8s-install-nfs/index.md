@@ -17,7 +17,7 @@ NFS 是一種網路檔案系統協定，可以讓多個容器和 Pod 在不同�
 
 ## 步驟
 
-每個 node 都需要安裝。
+每個 Node 都需要安裝。
 
 ### 安裝 NFS 客戶端工具 (nfs-common)
 
@@ -44,12 +44,15 @@ sudo systemctl status nfs-kernel-server
 showmount -e <nfs_server_ip>
 ```
 
-### 選擇適合共享 nfs 目錄的 node (適合資料存儲的配置的 node)
+### 選擇適合共享 NFS 目錄的 Node (適合資料存儲的配置的 Node)
 
-進入 nfs server node，這邊選擇 /home/nfs/rw 作為共享目錄。
+進入 NFS Node，這邊選擇 /home/nfs/rw 作為共享目錄。
 
 ```bash
-sudo mkdir /home/nfs/rw
+cd /home
+sudo mkdir nfs
+cd nfs/
+sudo mkdir rw
 ```
 
 設置共享目錄。
@@ -67,19 +70,9 @@ exportfs -f
 sudo systemctl reload nfs-server
 ```
 
-### 安裝 Provisioner 自動建立持久化存儲
+### (補充) 將 NFS Node 共享目錄掛載到其他 Node 的指定目錄裡
 
-```bash
-# 將 Provisioner 安裝在 namespace nfs 中管理
-sudo kubectl create ns nfs
-# 下載 Provisioner
-sudo helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
-helm repo update
-```
-
-### (補充) 將 nfs server node 共享目錄掛載到其他 node 的指定目錄裡
-
-進入其他 node，選擇要同步共享目錄的資料夾。
+進入其他 Node，選擇要同步共享目錄的資料夾。
 
 ```bash
 sudo mkdir -p /mnt/nfs/rw

@@ -17,27 +17,30 @@ weight: 1
 ## 前言
 
 將 Jenkins 運行在 Kubernetes 上，可以大大提升 Jenkins 的彈性、擴展性和自動化管理。
-Jenkins 可以與 Kubernetes 上的其他服務 (如 Docker、Helm 等) 進行集成，實現更靈活和自動化的 Pipeline 流程
+Jenkins 可以與 Kubernetes 上的其他服務 (如 Docker、Helm 等) 進行集成，實現更靈活和自動化的 Pipeline 流程。
 
 ## 步驟
 
 ### 透過 Helm 下載 Jenkins
 
 ```bash
-helm repo add jenkinsci https://charts.jenkins.io
-helm repo update
+sudo helm repo add jenkinsci https://charts.jenkins.io
+sudo helm repo update
 # 查看 Jenkins repo
-helm search repo jenkinsci
+sudo helm search repo jenkinsci
 ```
 
 ### 新增 Provisioner 讓建立 Jenkins 時透過 StorageClass 自動產生存取 PVC、PV
 
-假設 NFS 服務共享目錄為 /home/nfs/rw/jenkins 。
+在 NFS Node 新增 /home/nfs/rw/jenkins，並且將其加入共享目錄。
 
 ```bash
 # 加上共享設定
 # /home/nfs/rw/jenkins <nfs_server_ip>.0.0/16(rw,sync,no_subtree_check,no_root_squash)
 sudo nano /etc/exports
+# 重新加載
+exportfs -f
+sudo systemctl reload nfs-server
 ```
 
 ```bash
@@ -53,7 +56,13 @@ sudo helm install <provisioner_name> nfs-subdir-external-provisioner/nfs-subdir-
 
 ### 新增 Service Account
 
-在目錄中新增 [jenkins-sa.yaml](https://raw.githubusercontent.com/installing-jenkins-on-kubernetes/jenkins-sa.yaml) 並且建立起來。
+新增 Namespace jenkins 將 Jenkins 相關服務都裝在此 Namespace。
+
+```bash
+sudo kubectl create ns jenkins
+```
+
+在目錄中新增 [jenkins-sa.yaml](https://raw.githubusercontent.com/jenkins-infra/jenkins.io/master/content/doc/tutorials/kubernetes/installing-jenkins-on-kubernetes/jenkins-sa.yaml) 並且建立起來。
 
 ```bash
 sudo kubectl apply -f jenkins-sa.yaml
@@ -61,7 +70,7 @@ sudo kubectl apply -f jenkins-sa.yaml
 
 ### 新增 Values
 
-在目錄中新增 [jenkins-values.yaml](raw.githubusercontent.com/jenkinsci/helm-charts/main/charts/jenkins/values.yaml) 並且調整設定。
+在目錄中新增 [jenkins-values.yaml](https://raw.githubusercontent.com/jenkinsci/helm-charts/main/charts/jenkins/values.yaml) 並且調整設定。
 
 ```yaml
 # 指定剛才建立的 Provisioner 所提供的 <storageClass_name>
@@ -74,17 +83,52 @@ name: jenkins
 annotations: {}
 ```
 
-### 使用 Helm 安裝
+### 使用 Helm 安裝 Jenkins
 
 ```bash
 # 安裝 Jenkins
 sudo helm install jenkins -n jenkins -f jenkins-values.yaml jenkinsci/jenkins --kubeconfig /etc/rancher/k3s/k3s.yaml
 # 卸載 Jenkins
 sudo helm uninstall jenkins -n jenkins --kubeconfig /etc/rancher/k3s/k3s.yaml
-#取得 admin 用戶的密碼
+```
+
+### 將 Service 改為 Type: NodePort 方便測試
+
+```bash
+# 進入 service 修改
+sudo kubectl edit svc jenkins -n jenkins
+```
+
+指定對外的 Port，並且將 Type 改為 NodePort 即可使用 \<node_ip\>:\<port\> 連線。
+
+```yaml
+spec:
+  ports:
+  - nodePort: 30020
+  type: NodePort
+```
+
+取得 admin 用戶的密碼。
+
+```bash
 jsonpath="{.data.jenkins-admin-password}"
 secret=$(sudo kubectl get secret -n jenkins jenkins -o jsonpath=$jsonpath --kubeconfig /etc/rancher/k3s/k3s.yaml)
 echo $(echo $secret | base64 --decode)
+```
+
+### (補充) 使用 Ngrok 將 Jenkins \<node_ip\>:\<port\> 公開就可以與其他服務對接
+
+安裝 Ngrok。
+進入官網 [Ngrok](https://ngrok.com/) 註冊帳號候登入，即可在 Getting Started \> Step & Installation 取得安裝步驟。
+
+```powershell
+choco install ngrok
+ngrok config add-authtoken <auth_token>
+```
+
+執行 Ngrok 將 Jenkins \<node_ip\>:\<port\> 公開。
+```powershell
+ngrok http http://<node_ip>:<port>
 ```
 
 ## 參考
