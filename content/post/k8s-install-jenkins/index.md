@@ -68,6 +68,16 @@ sudo kubectl create ns jenkins
 sudo kubectl apply -f jenkins-sa.yaml
 ```
 
+因為以後會配置 ingress 所以要再加上 resources ingresses 項目。
+
+```yaml
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - ingresses
+```
+
 ### 新增 Values
 
 在目錄中新增 [jenkins-values.yaml](https://raw.githubusercontent.com/jenkinsci/helm-charts/main/charts/jenkins/values.yaml) 並且調整設定。
