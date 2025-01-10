@@ -15,6 +15,8 @@
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">shell&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">node_name&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="c"># 進入虛擬機&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">delete&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">node_name&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="c"># 刪除虛擬機&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">purge&lt;/span> &lt;span class="c"># 清除已刪除虛擬機&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c"># 將虛擬機檔案複製到本機&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">transfer&lt;/span> &lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">node_name&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>&lt;span class="err">:&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">file_path&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="p">.&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="在-master-node-建立-k3s">在 Master Node 建立 K3s
 &lt;/h3>&lt;p>進入 Master Node。&lt;/p>
 &lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-powershell" data-lang="powershell">&lt;span class="line">&lt;span class="cl">&lt;span class="n">multipass&lt;/span> &lt;span class="n">shell&lt;/span> &lt;span class="nb">k8s-master&lt;/span>
