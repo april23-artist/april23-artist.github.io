@@ -42,6 +42,8 @@ multipass stop <node_name>   # 關閉虛擬機
 multipass shell <node_name>  # 進入虛擬機
 multipass delete <node_name> # 刪除虛擬機
 multipass purge              # 清除已刪除虛擬機
+# 將虛擬機檔案複製到本機
+multipass transfer <node_name>:<file_path> .
 ```
 
 ### 在 Master Node 建立 K3s
