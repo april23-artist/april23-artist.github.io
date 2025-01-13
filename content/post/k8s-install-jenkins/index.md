@@ -109,13 +109,20 @@ sudo helm uninstall jenkins -n jenkins --kubeconfig /etc/rancher/k3s/k3s.yaml
 sudo kubectl edit svc jenkins -n jenkins
 ```
 
-指定對外的 Port，並且將 Type 改為 NodePort 即可使用 \<node_ip\>:\<port\> 連線。
+調整 Service 指定對外的 Port，並且將 Type 改為 NodePort 即可使用 \<node_ip\>:\<port\> 連線。
 
 ```yaml
 spec:
   ports:
   - nodePort: 30020
   type: NodePort
+```
+
+或是直接在 jenkins-values.yaml 修改再進行安裝。
+
+```yaml
+serviceType: NodePort
+nodePort: 30020
 ```
 
 取得 admin 用戶的密碼。
