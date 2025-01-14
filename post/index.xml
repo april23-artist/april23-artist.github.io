@@ -1,4 +1,35 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Allen Artist</title><link>https://april23-artist.github.io/post/</link><description>Recent content in Posts on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 14 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>使用 Openssl 生成證書</title><link>https://april23-artist.github.io/p/openssl-create-certificate/</link><pubDate>Tue, 14 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/openssl-create-certificate/</guid><description>&lt;h2 id="前言">前言
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Allen Artist</title><link>https://april23-artist.github.io/post/</link><description>Recent content in Posts on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 14 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Jenkins 與 GitHub 連結</title><link>https://april23-artist.github.io/p/jenkins-connect-github/</link><pubDate>Tue, 14 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/jenkins-connect-github/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>透過 GitHub Personal access tokens 讓 Jenkins 可以透過連結取得 Repository。&lt;/p>
+&lt;h2 id="步驟">步驟
+&lt;/h2>&lt;h3 id="在-jenkins-安裝-github-plugins">在 Jenkins 安裝 GitHub Plugins
+&lt;/h3>&lt;p>進入 Plugins 安裝 GitHub。&lt;/p>
+&lt;p>&lt;img src="1736827544563.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;p>&lt;img src="1736827576773.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;h3 id="新增-pipeline-並設定-github-url">新增 Pipeline 並設定 GitHub URL
+&lt;/h3>&lt;p>新增 Pipeline 作業。&lt;/p>
+&lt;p>&lt;img src="1736827742235.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;p>設定 Build Triggers，勾選 GitHub hook trigger for GITScm polling。&lt;/p>
+&lt;p>&lt;img src="1736827769989.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;p>設定 Repository URL，連結格式為 https://&amp;lt;personal_access_token&amp;gt;@github.com/&amp;lt;repository_name&amp;gt;.git。&lt;/br>
+&amp;lt;personal_access_token&amp;gt; 需在 GitHub 產生並取得。&lt;/p>
+&lt;p>&lt;img src="1736827904717.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;p>或是新增 Credentials 將 Token 資訊儲存在 Jenkins 中。Username 為 GitHub 用戶名稱，Password 為 GitHub Personal access tokens。&lt;/p>
+&lt;p>&lt;img src="1736841634587.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;p>&lt;img src="1736841423821.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;p>指定 Repository 的分支。&lt;/p>
+&lt;p>&lt;img src="1736827953356.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;h3 id="補充-產生新的-github-personal-access-tokens">(補充) 產生新的 GitHub Personal access tokens
+&lt;/h3>&lt;p>進入使用者選單下的 Settings &amp;gt; Developer settings。&lt;/p>
+&lt;p>&lt;img src="1736828059382.jpg" alt="image" width="400"> &lt;/br>&lt;/p>
+&lt;p>產生 Personal access tokens。&lt;/p>
+&lt;p>&lt;img src="1736828088274.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;p>設定 Personal access tokens 可使用的範圍。&lt;/p>
+&lt;p>&lt;img src="1736828258534.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;h2 id="參考">參考
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://ithelp.ithome.com.tw/articles/10267686" target="_blank" rel="noopener"
+>建立新的Jenkins任務並與Github連結&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>使用 Openssl 生成證書</title><link>https://april23-artist.github.io/p/openssl-create-certificate/</link><pubDate>Tue, 14 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/openssl-create-certificate/</guid><description>&lt;h2 id="前言">前言
 &lt;/h2>&lt;p>我們將使用 OpenSSL 生成證書，並將其應用於 Kubernetes 中的服務間通信。這些證書可以用來保障 Kubernetes Cluster 中服務之間的安全通信。&lt;/p>
 &lt;h2 id="步驟">步驟
 &lt;/h2>&lt;h3 id="使用-openssl-生成證書">使用 OpenSSL 生成證書
@@ -81,7 +112,33 @@
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">options&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">TokenValidationParameters&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IssuerSigningKey&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">RsaSecurityKey&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">rsa&lt;/span>&lt;span class="p">);&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">options&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">TokenValidationParameters&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ValidateIssuerSigningKey&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="kc">true&lt;/span>&lt;span class="p">;&lt;/span>
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">});&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>透過 GitHub Actions 將 Image 推送到 DockerHub</title><link>https://april23-artist.github.io/p/github-actions-push-image-to-dockerhub/</link><pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/github-actions-push-image-to-dockerhub/</guid><description>&lt;h2 id="前言">前言
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>產生 Jenkins Webhook 提供其他服務調用</title><link>https://april23-artist.github.io/p/jenkins-webhook/</link><pubDate>Tue, 14 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/jenkins-webhook/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>在持續集成和持續交付 (CI/CD) 流程中，Webhook 是一種常用的觸發機制。本文將介紹如何在 Jenkins 中使用 Generic Webhook Trigger 插件來設置和使用 Webhook 調用功能，以便在特定事件發生時自動觸發 Jenkins 任務。&lt;/p>
+&lt;h2 id="步驟">步驟
+&lt;/h2>&lt;h3 id="安裝-generic-webhook-trigger-插件">安裝 Generic Webhook Trigger 插件
+&lt;/h3>&lt;p>進入 Manage Jenkins &amp;gt; Available plugins 安裝 Generic Webhook Trigger Plugin。&lt;/p>
+&lt;p>&lt;img src="1736844253280.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;h3 id="配置-jenkins-任務">配置 Jenkins 任務
+&lt;/h3>&lt;p>創建或打開一個現有的 Jenkins 作業，在 Jenkins 作業中啟用 Generic Webhook Trigger。&lt;/p>
+&lt;p>&lt;img src="1736844830889.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;p>設定 Webhook Token，這邊設定為 echo -n &amp;ldquo;username:password&amp;rdquo; | base64 產生的值。&lt;/p>
+&lt;p>&lt;img src="1736844850431.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;h3 id="配置-webhook-url-以-github-actions-為範例">配置 Webhook URL (以 GitHub Actions 為範例)
+&lt;/h3>&lt;p>在 GitHub Actions secrets and variables 設定 Secrets。 &lt;/br>
+JENKINS_WEBHOOK_URL 設定為 http://JENKINS_URL/generic-webhook-trigger/invoke 。 &lt;/br>
+JENKINS_BASIC_AUTH 設定為上述產生的 Webhook Token。&lt;/p>
+&lt;p>&lt;img src="1736844927973.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;p>以 GitHub Action 使用 Post 呼叫 Jenkins 啟動。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">jobs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">build&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">runs-on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ubuntu-latest&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">steps&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Notify Jenkins to deploy Docker image&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">|&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> curl -X POST ${{ secrets.JENKINS_WEBHOOK_URL }} \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> -H &amp;#34;Authorization: Bearer ${{ secrets.JENKINS_BASIC_AUTH }}&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>透過 GitHub Actions 將 Image 推送到 DockerHub</title><link>https://april23-artist.github.io/p/github-actions-push-image-to-dockerhub/</link><pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/github-actions-push-image-to-dockerhub/</guid><description>&lt;h2 id="前言">前言
 &lt;/h2>&lt;h2 id="步驟">步驟
 &lt;/h2>&lt;h3 id="取得-dockerhub-的-personal-access-token">取得 DockerHub 的 Personal access token
 &lt;/h3>&lt;p>DockerHub 新增 Personal access token。 &lt;/br>&lt;/p>

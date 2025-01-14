@@ -1,4 +1,30 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>GitHub Actions on Allen Artist</title><link>https://april23-artist.github.io/tags/github-actions/</link><description>Recent content in GitHub Actions on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 02 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/tags/github-actions/index.xml" rel="self" type="application/rss+xml"/><item><title>透過 GitHub Actions 將 Image 推送到 DockerHub</title><link>https://april23-artist.github.io/p/github-actions-push-image-to-dockerhub/</link><pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/github-actions-push-image-to-dockerhub/</guid><description>&lt;h2 id="前言">前言
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>GitHub Actions on Allen Artist</title><link>https://april23-artist.github.io/tags/github-actions/</link><description>Recent content in GitHub Actions on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 14 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/tags/github-actions/index.xml" rel="self" type="application/rss+xml"/><item><title>產生 Jenkins Webhook 提供其他服務調用</title><link>https://april23-artist.github.io/p/jenkins-webhook/</link><pubDate>Tue, 14 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/jenkins-webhook/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>在持續集成和持續交付 (CI/CD) 流程中，Webhook 是一種常用的觸發機制。本文將介紹如何在 Jenkins 中使用 Generic Webhook Trigger 插件來設置和使用 Webhook 調用功能，以便在特定事件發生時自動觸發 Jenkins 任務。&lt;/p>
+&lt;h2 id="步驟">步驟
+&lt;/h2>&lt;h3 id="安裝-generic-webhook-trigger-插件">安裝 Generic Webhook Trigger 插件
+&lt;/h3>&lt;p>進入 Manage Jenkins &amp;gt; Available plugins 安裝 Generic Webhook Trigger Plugin。&lt;/p>
+&lt;p>&lt;img src="1736844253280.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;h3 id="配置-jenkins-任務">配置 Jenkins 任務
+&lt;/h3>&lt;p>創建或打開一個現有的 Jenkins 作業，在 Jenkins 作業中啟用 Generic Webhook Trigger。&lt;/p>
+&lt;p>&lt;img src="1736844830889.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;p>設定 Webhook Token，這邊設定為 echo -n &amp;ldquo;username:password&amp;rdquo; | base64 產生的值。&lt;/p>
+&lt;p>&lt;img src="1736844850431.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;h3 id="配置-webhook-url-以-github-actions-為範例">配置 Webhook URL (以 GitHub Actions 為範例)
+&lt;/h3>&lt;p>在 GitHub Actions secrets and variables 設定 Secrets。 &lt;/br>
+JENKINS_WEBHOOK_URL 設定為 http://JENKINS_URL/generic-webhook-trigger/invoke 。 &lt;/br>
+JENKINS_BASIC_AUTH 設定為上述產生的 Webhook Token。&lt;/p>
+&lt;p>&lt;img src="1736844927973.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;p>以 GitHub Action 使用 Post 呼叫 Jenkins 啟動。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">jobs&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">build&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">runs-on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">ubuntu-latest&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">steps&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Notify Jenkins to deploy Docker image&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">run&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">|&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> curl -X POST ${{ secrets.JENKINS_WEBHOOK_URL }} \
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> -H &amp;#34;Authorization: Bearer ${{ secrets.JENKINS_BASIC_AUTH }}&amp;#34;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>透過 GitHub Actions 將 Image 推送到 DockerHub</title><link>https://april23-artist.github.io/p/github-actions-push-image-to-dockerhub/</link><pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/github-actions-push-image-to-dockerhub/</guid><description>&lt;h2 id="前言">前言
 &lt;/h2>&lt;h2 id="步驟">步驟
 &lt;/h2>&lt;h3 id="取得-dockerhub-的-personal-access-token">取得 DockerHub 的 Personal access token
 &lt;/h3>&lt;p>DockerHub 新增 Personal access token。 &lt;/br>&lt;/p>
