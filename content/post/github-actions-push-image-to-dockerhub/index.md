@@ -17,7 +17,7 @@ weight: 1
 
 ### 取得 DockerHub 的 Personal access token
 
-DockerHub 新增 Personal access token。 </br>
+DockerHub 推出了 Personal access token 來取代密碼認證。這是更安全且推薦的方式來驗證與 DockerHub 互動。 </br>
 
 <img src="1735638701696.jpg" alt="image" width="400"> </br>
 
