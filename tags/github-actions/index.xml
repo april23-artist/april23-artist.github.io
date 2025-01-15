@@ -27,7 +27,7 @@ JENKINS_BASIC_AUTH 設定為上述產生的 Webhook Token。&lt;/p>
 &lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>透過 GitHub Actions 將 Image 推送到 DockerHub</title><link>https://april23-artist.github.io/p/github-actions-push-image-to-dockerhub/</link><pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/github-actions-push-image-to-dockerhub/</guid><description>&lt;h2 id="前言">前言
 &lt;/h2>&lt;h2 id="步驟">步驟
 &lt;/h2>&lt;h3 id="取得-dockerhub-的-personal-access-token">取得 DockerHub 的 Personal access token
-&lt;/h3>&lt;p>DockerHub 新增 Personal access token。 &lt;/br>&lt;/p>
+&lt;/h3>&lt;p>DockerHub 推出了 Personal access token 來取代密碼認證。這是更安全且推薦的方式來驗證與 DockerHub 互動。 &lt;/br>&lt;/p>
 &lt;p>&lt;img src="1735638701696.jpg" alt="image" width="400"> &lt;/br>&lt;/p>
 &lt;p>&lt;img src="1735638795528.jpg" alt="image" width="400"> &lt;/br>&lt;/p>
 &lt;p>&lt;img src="1735638843973.jpg" alt="image" width="800"> &lt;/br>&lt;/p>

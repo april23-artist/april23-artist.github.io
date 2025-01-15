@@ -1,4 +1,92 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DevOps on Allen Artist</title><link>https://april23-artist.github.io/categories/devops/</link><description>Recent content in DevOps on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 14 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/categories/devops/index.xml" rel="self" type="application/rss+xml"/><item><title>Jenkins 與 GitHub 連結</title><link>https://april23-artist.github.io/p/jenkins-connect-github/</link><pubDate>Tue, 14 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/jenkins-connect-github/</guid><description>&lt;h2 id="前言">前言
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>DevOps on Allen Artist</title><link>https://april23-artist.github.io/categories/devops/</link><description>Recent content in DevOps on Allen Artist</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 15 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://april23-artist.github.io/categories/devops/index.xml" rel="self" type="application/rss+xml"/><item><title>使用 Jenkinsfile 將 Image 推送到 Docker Hub</title><link>https://april23-artist.github.io/p/jenkins-push-image-to-dockerhub/</link><pubDate>Wed, 15 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/jenkins-push-image-to-dockerhub/</guid><description>&lt;h2 id="前言">前言
+&lt;/h2>&lt;p>Kaniko 是一個在 Kubernetes 環境下建構 Docker 映像的工具，它不需要 Docker 守護進程，並且可以更安全地在容器中執行。&lt;/p>
+&lt;h2 id="步驟">步驟
+&lt;/h2>&lt;h3 id="取得-dockerhub-的-personal-access-token">取得 DockerHub 的 Personal access token
+&lt;/h3>&lt;p>DockerHub 推出了 Personal access token 來取代密碼認證。這是更安全且推薦的方式來驗證與 DockerHub 互動。 &lt;/br>&lt;/p>
+&lt;p>&lt;img src="1735638701696.jpg" alt="image" width="400"> &lt;/br>&lt;/p>
+&lt;p>&lt;img src="1735638795528.jpg" alt="image" width="400"> &lt;/br>&lt;/p>
+&lt;p>&lt;img src="1735638843973.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
+&lt;h3 id="登錄-docker-並創建配置文件">登錄 Docker 並創建配置文件
+&lt;/h3>&lt;p>config.json 文件會存放於 ~/.docker/config.json。然後使用 base64 編碼該文件。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">docker login -u allenart
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pw: &amp;lt;dockerhub_token&amp;gt;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">cat ~/.docker/config.json &lt;span class="p">|&lt;/span> base64 -w &lt;span class="m">0&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="將-configjson-編碼資訊建立為-kubernetes-secret">將 config.json 編碼資訊建立為 Kubernetes Secret
+&lt;/h3>&lt;p>將 &amp;lt;base64-dockerconfigjson&amp;gt; 替換為 config.json base64 編碼字串。&lt;/p>
+&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">apiVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">v1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Secret&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">metadata&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">name&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">dockerhub-token&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">type&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">kubernetes.io/dockerconfigjson&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">data&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">.dockerconfigjson&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="p">|&lt;/span>&lt;span class="sd">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="sd"> &amp;lt;base64-dockerconfigjson&amp;gt;&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h3 id="jenkinsfile-agent-安裝-kaniko-並設定權限">Jenkinsfile Agent 安裝 Kaniko 並設定權限
+&lt;/h3>&lt;div class="highlight">&lt;pre tabindex="0" class="chroma">&lt;code class="language-groovy" data-lang="groovy">&lt;span class="line">&lt;span class="cl">&lt;span class="n">pipeline&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">agent&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">kubernetes&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">label&lt;/span> &lt;span class="s1">&amp;#39;multi-tool-agent&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">yaml&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">apiVersion: v1
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">kind: Pod
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">metadata:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> name: build-pod
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">spec:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> containers:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> - name: kaniko
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> image: gcr.io/kaniko-project/executor:debug
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> command:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> - sleep
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> - &amp;#34;3600&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> volumeMounts:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> - name: kaniko-secret
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> mountPath: /kaniko/.docker
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> volumes:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> - name: kaniko-secret
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> secret:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> secretName: dockerhub-token
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> items:
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> - key: .dockerconfigjson
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> path: config.json
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">environment&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DOCKER_REGISTRY&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;docker.io/username&amp;#34;&lt;/span> &lt;span class="c1">// 修改為正確的 DockerHub 用戶名
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">DOCKER_IMAGE&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;imagename&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ENV_DIR&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;${env.WORKSPACE}&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">DOCKERFILE_DIR&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;Dockerfile&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">stages&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">stage&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="s1">&amp;#39;Checkout&amp;#39;&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">steps&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">checkout&lt;/span> &lt;span class="n">scm&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">stage&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="s1">&amp;#39;Build and Push Docker Image&amp;#39;&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">steps&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">container&lt;/span>&lt;span class="o">(&lt;/span>&lt;span class="s1">&amp;#39;kaniko&amp;#39;&lt;/span>&lt;span class="o">)&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">script&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sh&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> /kaniko/executor --context $ENV_DIR --dockerfile $ENV_DIR/$DOCKERFILE_DIR --destination $DOCKER_REGISTRY/$DOCKER_IMAGE:latest
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s2"> &amp;#34;&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">post&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">always&lt;/span> &lt;span class="o">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">echo&lt;/span> &lt;span class="s1">&amp;#39;Cleaning up...&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="o">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="結論">結論
+&lt;/h2>&lt;p>這篇文章介紹了如何在 Jenkins 中設置使用 Kaniko 推送 Docker 映像到 Docker Hub 的流程。對於開發與運維團隊來說，這是一個非常有用的自動化部署解決方案，可以大幅減少手動推送 Docker 映像的繁瑣步驟。&lt;/p></description></item><item><title>Jenkins 與 GitHub 連結</title><link>https://april23-artist.github.io/p/jenkins-connect-github/</link><pubDate>Tue, 14 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/jenkins-connect-github/</guid><description>&lt;h2 id="前言">前言
 &lt;/h2>&lt;p>透過 GitHub Personal access tokens 讓 Jenkins 可以透過連結取得 Repository。&lt;/p>
 &lt;h2 id="步驟">步驟
 &lt;/h2>&lt;h3 id="在-jenkins-安裝-github-plugins">在 Jenkins 安裝 GitHub Plugins
@@ -58,7 +146,7 @@ JENKINS_BASIC_AUTH 設定為上述產生的 Webhook Token。&lt;/p>
 &lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>透過 GitHub Actions 將 Image 推送到 DockerHub</title><link>https://april23-artist.github.io/p/github-actions-push-image-to-dockerhub/</link><pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate><guid>https://april23-artist.github.io/p/github-actions-push-image-to-dockerhub/</guid><description>&lt;h2 id="前言">前言
 &lt;/h2>&lt;h2 id="步驟">步驟
 &lt;/h2>&lt;h3 id="取得-dockerhub-的-personal-access-token">取得 DockerHub 的 Personal access token
-&lt;/h3>&lt;p>DockerHub 新增 Personal access token。 &lt;/br>&lt;/p>
+&lt;/h3>&lt;p>DockerHub 推出了 Personal access token 來取代密碼認證。這是更安全且推薦的方式來驗證與 DockerHub 互動。 &lt;/br>&lt;/p>
 &lt;p>&lt;img src="1735638701696.jpg" alt="image" width="400"> &lt;/br>&lt;/p>
 &lt;p>&lt;img src="1735638795528.jpg" alt="image" width="400"> &lt;/br>&lt;/p>
 &lt;p>&lt;img src="1735638843973.jpg" alt="image" width="800"> &lt;/br>&lt;/p>
